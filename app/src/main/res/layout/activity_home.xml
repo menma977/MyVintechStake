@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".view.HomeActivity"
+    android:keepScreenOn="true"
     android:background="@drawable/background">
 
   <LinearLayout
@@ -44,10 +45,185 @@
           android:layout_height="wrap_content"
           android:orientation="horizontal">
 
+        <TextView
+            android:text="@string/balance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorAccent"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:text="@string/value_doge"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/textViewBalance"
+            android:layout_weight="1"
+            android:textColor="@color/colorPrimaryDark"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"/>
+
+        <TextView
+            android:text="@string/doge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorAccent"
+            android:textStyle="bold"/>
       </LinearLayout>
 
     </LinearLayout>
-    
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="20dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_margin="10dp"
+        android:padding="10dp"
+        android:background="@drawable/card">
+
+      <TextView
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:id="@+id/textViewStatus"
+          android:gravity="center"
+          android:textStyle="bold"
+          android:textColor="@color/Success"
+          android:textSize="18sp"
+          android:hint="@string/status"/>
+
+      <Space
+          android:layout_width="match_parent"
+          android:layout_height="5dp"/>
+
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="horizontal">
+
+        <TextView
+            android:text="@string/fund"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorPrimaryDark"
+            android:layout_marginEnd="10dp"/>
+
+        <TextView
+            android:text="@string/fund"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/textViewFund"
+            android:layout_weight="1"
+            android:textColor="@color/colorAccent"/>
+
+      </LinearLayout>
+
+      <Space
+          android:layout_width="match_parent"
+          android:layout_height="10dp"/>
+
+      <EditText
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:inputType="numberDecimal"
+          android:ems="10"
+          android:id="@+id/editTextAmount"
+          android:background="@drawable/edit_text"
+          android:hint="@string/amount"
+          android:textColor="@color/colorAccent"
+          android:importantForAutofill="no"
+          android:padding="10dp"/>
+
+      <Space
+          android:layout_width="match_parent"
+          android:layout_height="10dp"/>
+
+      <SeekBar
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:id="@+id/seekBarHigh"
+          android:max="10"
+          android:progress="5"
+          android:progressDrawable="@drawable/seekbar_style"
+          android:thumb="@drawable/seekbar_thumb"/>
+
+      <Space
+          android:layout_width="match_parent"
+          android:layout_height="10dp"/>
+
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="horizontal">
+
+        <Button
+            android:text="@string/stake"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:id="@+id/buttonStake"
+            android:layout_weight="1"
+            android:background="@drawable/button_success"
+            android:textColor="@color/textSecondary"
+            tools:ignore="ButtonStyle"
+            android:layout_marginEnd="5dp"/>
+
+        <Button
+            android:text="@string/stop"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:id="@+id/buttonStop"
+            android:layout_weight="1"
+            android:background="@drawable/button_danger"
+            android:textColor="@color/textSecondary"
+            tools:ignore="ButtonStyle"
+            android:layout_marginStart="5dp"/>
+
+      </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="10dp"
+        android:elevation="5dp"
+        android:padding="15dp"
+        android:background="@drawable/card"
+        android:baselineAligned="false">
+
+      <LinearLayout
+          android:id="@+id/linearLayoutFund"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:orientation="vertical"
+          android:layout_weight="1"/>
+
+      <LinearLayout
+          android:id="@+id/linearLayoutHigh"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:orientation="vertical"
+          android:layout_weight="1"/>
+
+      <LinearLayout
+          android:id="@+id/linearLayoutResult"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:orientation="vertical"
+          android:layout_weight="1"/>
+
+      <LinearLayout
+          android:id="@+id/linearLayoutStatus"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:orientation="vertical"
+          android:layout_weight="1"/>
+
+    </LinearLayout>
+
   </LinearLayout>
 
 </ScrollView>

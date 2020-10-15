@@ -5,4 +5,12 @@
   <string name="password">password</string>
   <string name="version">Version</string>
   <string name="login">Login</string>
+  <string name="value_doge">0.00000000</string>
+  <string name="balance">BALANCE</string>
+  <string name="doge">DOGE</string>
+  <string name="fund">Fund</string>
+  <string name="amount">Amount</string>
+  <string name="status">Status</string>
+  <string name="stake">Stake</string>
+  <string name="stop">Stop</string>
 </resources>
