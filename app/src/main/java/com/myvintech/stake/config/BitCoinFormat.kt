@@ -3,7 +3,7 @@ package com.myvintech.stake.config
 import java.math.BigDecimal
 import java.text.DecimalFormat
 
-class BitCoinFormat {
+object BitCoinFormat {
   private var longFormat = BigDecimal(100000000)
   private var bigDecimalFormat = BigDecimal(0.00000001)
   private val decimalFormat = DecimalFormat("#.########")
