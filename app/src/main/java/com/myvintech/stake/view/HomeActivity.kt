@@ -15,7 +15,6 @@ class HomeActivity : AppCompatActivity() {
   private lateinit var textUsername: TextView
   private lateinit var textBalance: TextView
   private lateinit var balance: BigDecimal
-
   private lateinit var user: User
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,11 +23,7 @@ class HomeActivity : AppCompatActivity() {
     setContentView(R.layout.activity_home)
     user = User(applicationContext)
 
-    var b:String = intent.getStringExtra("balance")
-    Toast.makeText(applicationContext, b,
-      Toast.LENGTH_LONG).show()
-    if(b.isNullOrEmpty()) b = "0"
-    balance = b.toBigDecimal()
+    balance = intent.getSerializableExtra("balance") as BigDecimal
 
 
     textUsername = findViewById(R.id.textViewUsername)

@@ -19,6 +19,7 @@ import com.myvintech.stake.model.User
 import com.myvintech.stake.view.HomeActivity
 import org.json.JSONObject
 import java.util.*
+import java.util.concurrent.Executors
 import kotlin.collections.HashMap
 import kotlin.concurrent.schedule
 
@@ -33,6 +34,7 @@ class LoginActivity : AppCompatActivity() {
   private lateinit var passwordInput: EditText
   private lateinit var loginButton: Button
   private lateinit var json: JSONObject
+  private val executor = Executors.newFixedThreadPool(10)
   private var body = HashMap<String, String>()
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -84,7 +86,7 @@ class LoginActivity : AppCompatActivity() {
     body["password"] = password
     body["Totp"] = "''"
     Timer().schedule(500) {
-      json = DogeController(body).execute().get()
+      json = executor.submit(DogeController(body)).get()
       if (json.getInt("code") == 200) {
         runOnUiThread {
           user.setString("session", json.getJSONObject("data").getString("SessionCookie"))

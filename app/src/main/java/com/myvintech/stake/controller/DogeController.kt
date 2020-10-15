@@ -1,6 +1,5 @@
 package com.myvintech.stake.controller
 
-import android.os.AsyncTask
 import com.myvintech.stake.config.MapToJson
 import com.myvintech.stake.model.Url
 import okhttp3.MediaType
@@ -11,9 +10,10 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.InputStreamReader
+import java.util.concurrent.Callable
 
-class DogeController(private var bodyValue: HashMap<String, String>) : AsyncTask<Void, Void, JSONObject>() {
-  override fun doInBackground(vararg p0: Void): JSONObject {
+class DogeController(private var bodyValue: HashMap<String, String>) : Callable<JSONObject> {
+  override fun call(): JSONObject {
     return try {
       val client = OkHttpClient.Builder().build()
       val mediaType: MediaType = "application/x-www-form-urlencoded".toMediaType()
@@ -67,6 +67,7 @@ class DogeController(private var bodyValue: HashMap<String, String>) : AsyncTask
         }
       }
     } catch (e: Exception) {
+      e.printStackTrace()
       JSONObject().put("code", 500).put("data", "error connection")
     }
   }
