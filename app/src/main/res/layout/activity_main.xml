@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    android:background="@color/background"
+    android:gravity="center"
+    android:orientation="vertical">
+
+  <LinearLayout
+      android:layout_width="200dp"
+      android:layout_height="200dp"
+      android:orientation="vertical"
+      android:gravity="center"
+      android:background="@drawable/card"
+      android:elevation="10dp">
+
+    <ProgressBar
+        style="?android:attr/progressBarStyle"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:progressDrawable="@drawable/progressbar_circular"
+        android:indeterminateDrawable="@drawable/progressbar_circular"
+        android:background="@mipmap/ic_launcher_foreground"/>
+
+  </LinearLayout>
+
+</LinearLayout>
