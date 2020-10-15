@@ -36,4 +36,8 @@ class Doge(context: Context) {
     sharedPreferences.edit().clear().apply()
     sharedPreferencesEditor.clear()
   }
+
+  fun tokenDoge(): String {
+    return "afd295e94fd841648cada262363d79e7"
+  }
 }

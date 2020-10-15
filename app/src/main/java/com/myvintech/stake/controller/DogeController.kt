@@ -13,7 +13,7 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 
 class DogeController(private var bodyValue: HashMap<String, String>) : AsyncTask<Void, Void, JSONObject>() {
-  override fun doInBackground(vararg p0: Void?): JSONObject {
+  override fun doInBackground(vararg p0: Void): JSONObject {
     return try {
       val client = OkHttpClient.Builder().build()
       val mediaType: MediaType = "application/x-www-form-urlencoded".toMediaType()
