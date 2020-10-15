@@ -2,38 +2,42 @@ package com.myvintech.stake.config
 
 import android.util.Base64
 import javax.crypto.Cipher
+import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.IvParameterSpec
+import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.SecretKeySpec
 
-class Security {
-  private val bytes = ByteArray(32)
-  fun encrypt(value: String): String {
-    val secretKeySpec = secretKey(value)
-    val charArray = value.toCharArray()
-    for (i in charArray.indices) {
-      bytes[i] = charArray[i].toByte()
-    }
-    val ivParameterSpec = IvParameterSpec(bytes)
-    val cipher = Cipher.getInstance("AES/GCM/NoPadding")
-    cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec)
-    val encryptedValue = cipher.doFinal(value.toByteArray())
-    return Base64.encodeToString(encryptedValue, Base64.DEFAULT)
+object Security {
+
+  private val secretKey = "a*WGA8FjZm@i-GiInlKjq+ybYXX+upZD@c%shM1?S8bA"
+  private val salt = "aUx3OFYmLVBjSUpGaEhXSg=="
+  private val iv = "aWhaeHNjYWohSiZVREBxNw=="
+
+  fun encrypt(strToEncrypt: String) :  String{
+      val ivParameterSpec = IvParameterSpec(Base64.decode(iv, Base64.DEFAULT))
+
+      val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
+      val spec =  PBEKeySpec(secretKey.toCharArray(), Base64.decode(salt, Base64.DEFAULT), 255*64, 256)
+      val tmp = factory.generateSecret(spec)
+      val secretKey =  SecretKeySpec(tmp.encoded, "AES")
+
+      val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
+      cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivParameterSpec)
+      return Base64.encodeToString(cipher.doFinal(strToEncrypt.toByteArray(Charsets.UTF_8)), Base64.DEFAULT)
   }
 
-  fun decrypt(value: String): String {
-    val secretKeySpec = secretKey(value)
-    val charArray = value.toCharArray()
-    for (i in charArray.indices) {
-      bytes[i] = charArray[i].toByte()
-    }
-    val ivParameterSpec = IvParameterSpec(bytes)
-    val cipher = Cipher.getInstance("AES/GCM/NoPadding")
-    cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec)
-    val decryptedByteValue = cipher.doFinal(Base64.decode(value, Base64.DEFAULT))
-    return String(decryptedByteValue)
-  }
 
-  private fun secretKey(value: String): SecretKeySpec {
-    return SecretKeySpec(value.toByteArray(), "AES")
+  fun decrypt(strToDecrypt : String) : String {
+      val ivParameterSpec =  IvParameterSpec(Base64.decode(iv, Base64.DEFAULT))
+
+      val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
+      val spec =  PBEKeySpec(secretKey.toCharArray(), Base64.decode(salt, Base64.DEFAULT), 255*64, 256)
+      val tmp = factory.generateSecret(spec);
+      val secretKey =  SecretKeySpec(tmp.encoded, "AES")
+
+      val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding");
+      cipher.init(Cipher.DECRYPT_MODE, secretKey, ivParameterSpec);
+      return  String(cipher.doFinal(Base64.decode(strToDecrypt, Base64.DEFAULT)))
+
   }
 }
