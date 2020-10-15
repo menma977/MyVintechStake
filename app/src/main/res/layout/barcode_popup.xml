@@ -13,16 +13,16 @@
             android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Barcode"
-            app:layout_constraintBottom_toTopOf="@+id/imageView"
+            android:fontFamily="sans-serif-medium"
+            android:text="Withdraw"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@+id/qrcode"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintVertical_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
-            android:id="@+id/imageView"
+            android:id="@+id/qrcode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:contentDescription="barcode"
@@ -33,12 +33,22 @@
 
         <ImageView
             android:id="@+id/imageView3"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:contentDescription="logo"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@mipmap/ic_launcher_foreground" />
+
+        <TextView
+            android:id="@+id/wallet_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-black"
+            android:text="TextView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/qrcode" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

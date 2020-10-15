@@ -46,7 +46,9 @@ dependencies {
     /**
      * @new dependencies* barcode Generator
      */
-    implementation 'com.journeyapps:zxing-android-embedded:3.2.0@aar'
+    // implementation 'com.journeyapps:zxing-android-embedded:3.2.0@aar'
+    implementation 'com.journeyapps:zxing-android-embedded:3.6.0'
+    implementation 'com.android.support:multidex:1.0.3'
 
     /**
      * @new dependencies chart

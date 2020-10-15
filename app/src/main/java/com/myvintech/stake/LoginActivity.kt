@@ -18,6 +18,7 @@ import com.myvintech.stake.model.Doge
 import com.myvintech.stake.model.User
 import com.myvintech.stake.view.HomeActivity
 import org.json.JSONObject
+import java.math.BigDecimal
 import java.util.*
 import java.util.concurrent.Executors
 import kotlin.collections.HashMap
@@ -94,6 +95,7 @@ class LoginActivity : AppCompatActivity() {
           doge.setString("password", password)
           loading.closeDialog()
           move = Intent(applicationContext, HomeActivity::class.java)
+          move.putExtra("balance", BigDecimal(json.getJSONObject("data").getString("Balance")))
           finishAffinity()
           startActivity(move)
         }

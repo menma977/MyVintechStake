@@ -2,14 +2,14 @@ package com.myvintech.stake.view
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import android.widget.TextView
-import android.widget.Toast
 import com.myvintech.stake.R
 import com.myvintech.stake.config.BitCoinFormat
 import com.myvintech.stake.config.Security
 import com.myvintech.stake.model.User
 import java.math.BigDecimal
-import java.math.BigInteger
+import com.myvintech.stake.view.modal.CustomDialog
 
 class HomeActivity : AppCompatActivity() {
   private lateinit var textUsername: TextView
@@ -30,5 +30,9 @@ class HomeActivity : AppCompatActivity() {
     textBalance = findViewById(R.id.textViewBalance)
     textUsername.text = Security.decrypt(user.getString("username"))
     textBalance.text = BitCoinFormat.decimalToDoge(balance).toPlainString()
+
+    textBalance.setOnClickListener(View.OnClickListener {
+      CustomDialog.withdraw(this, "23")
+    })
   }
 }
