@@ -16,6 +16,7 @@ import com.myvintech.stake.config.Popup
 import com.myvintech.stake.controller.DogeController
 import com.myvintech.stake.model.Doge
 import com.myvintech.stake.model.User
+import com.myvintech.stake.view.HomeActivity
 import org.json.JSONObject
 import java.util.*
 import kotlin.collections.HashMap
@@ -90,6 +91,9 @@ class LoginActivity : AppCompatActivity() {
           doge.setString("username", username)
           doge.setString("password", password)
           loading.closeDialog()
+          move = Intent(applicationContext, HomeActivity::class.java)
+          finishAffinity()
+          startActivity(move)
         }
       } else {
         runOnUiThread {
