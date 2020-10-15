@@ -6,17 +6,11 @@ import android.os.Bundle
 import java.util.*
 import kotlin.concurrent.schedule
 
-class MainActivity : AppCompatActivity() {
+class LoginActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_main)
+    setContentView(R.layout.activity_login)
 
-    Timer().schedule(1000) {
-      runOnUiThread {
-        val goTo = Intent(applicationContext, LoginActivity::class.java)
 
-        startActivity(goTo)
-      }
-    }
   }
 }

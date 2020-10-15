@@ -1,3 +1,8 @@
 <resources>
-    <string name="app_name">MyVintechStake</string>
+  <string name="app_name">MyVintechStake</string>
+  <string name="logo">Logo</string>
+  <string name="username">username</string>
+  <string name="password">password</string>
+  <string name="version">Version</string>
+  <string name="login">Login</string>
 </resources>
