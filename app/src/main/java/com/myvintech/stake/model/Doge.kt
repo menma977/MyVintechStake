@@ -20,7 +20,7 @@ class Doge(context: Context) {
   }
 
   fun setString(id: String, value: String) {
-    sharedPreferencesEditor.putString(id, Security().encrypt(value))
+    sharedPreferencesEditor.putString(id, Security.encrypt(value))
     sharedPreferencesEditor.commit()
   }
 
@@ -28,7 +28,7 @@ class Doge(context: Context) {
     return if (sharedPreferences.getString(id, "").toString().isEmpty()) {
       ""
     } else {
-      Security().decrypt(sharedPreferences.getString(id, "").toString())
+      Security.decrypt(sharedPreferences.getString(id, "").toString())
     }
   }
 

@@ -13,8 +13,7 @@ object Security {
   private val salt = "aUx3OFYmLVBjSUpGaEhXSg=="
   private val iv = "aWhaeHNjYWohSiZVREBxNw=="
 
-  fun encrypt(strToEncrypt: String) :  String?
-  {
+  fun encrypt(strToEncrypt: String) :  String{
       val ivParameterSpec = IvParameterSpec(Base64.decode(iv, Base64.DEFAULT))
 
       val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
@@ -27,7 +26,8 @@ object Security {
       return Base64.encodeToString(cipher.doFinal(strToEncrypt.toByteArray(Charsets.UTF_8)), Base64.DEFAULT)
   }
 
-  fun decrypt(strToDecrypt : String) : String? {
+
+  fun decrypt(strToDecrypt : String) : String {
       val ivParameterSpec =  IvParameterSpec(Base64.decode(iv, Base64.DEFAULT))
 
       val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
