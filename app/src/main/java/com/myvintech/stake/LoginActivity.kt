@@ -1,12 +1,16 @@
 package com.myvintech.stake
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.myvintech.stake.config.Loading
 import com.myvintech.stake.config.Popup
 import com.myvintech.stake.controller.DogeController
@@ -21,7 +25,7 @@ class LoginActivity : AppCompatActivity() {
   private lateinit var user: User
   private lateinit var doge: Doge
   private lateinit var loading: Loading
-  private lateinit var goTo: Intent
+  private lateinit var move: Intent
   private lateinit var toast: Popup
   private lateinit var versionText: TextView
   private lateinit var usernameInput: EditText
@@ -49,6 +53,10 @@ class LoginActivity : AppCompatActivity() {
     loginButton.setOnClickListener {
       loading.openDialog()
       when {
+        !validatePermission() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> {
+          loading.closeDialog()
+          doRequestPermission()
+        }
         usernameInput.text.isEmpty() -> {
           loading.closeDialog()
           toast.show("username required", Toast.LENGTH_LONG)
@@ -88,6 +96,28 @@ class LoginActivity : AppCompatActivity() {
           loading.closeDialog()
           toast.show(json.getString("data"), Toast.LENGTH_LONG)
         }
+      }
+    }
+  }
+
+  private fun doRequestPermission() {
+    requestPermissions(
+      arrayOf(
+        Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE
+      ), 100
+    )
+  }
+
+  private fun validatePermission(): Boolean {
+    return when {
+      ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED -> {
+        false
+      }
+      ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED -> {
+        false
+      }
+      else -> {
+        true
       }
     }
   }
