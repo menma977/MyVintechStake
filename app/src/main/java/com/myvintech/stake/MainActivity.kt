@@ -23,25 +23,29 @@ class MainActivity : AppCompatActivity() {
     setContentView(R.layout.activity_main)
     val user = User(this)
     val cookie = user.getString("session")
-    if (cookie.isNotEmpty()) {
-      val doge = Doge(this)
-      val body = HashMap<String, String>()
-      body["a"] = "GetBalance"
-      body["key"] = doge.tokenDoge()
-      body["s"] = cookie
-      body["Currency"] = "doge"
-      json = executor.submit(DogeController(body)).get()
-      Toast.makeText(this, json.getString("code").toString(), Toast.LENGTH_LONG).show()
-      if (json.getInt("code") == 200) {
-        move = Intent(this, HomeActivity::class.java)
-        val data = json.getJSONObject("data")
-        move.putExtra("balance", BigDecimal(data.getString("Balance")))
-        return startActivity(move)
+    when {
+      cookie.isNotEmpty() -> {
+        val doge = Doge(this)
+        val body = HashMap<String, String>()
+        body["a"] = "GetBalance"
+        body["key"] = doge.tokenDoge()
+        body["s"] = cookie
+        body["Currency"] = "doge"
+        json = executor.submit(DogeController(body)).get()
+        if (json.getInt("code") == 200) {
+          move = Intent(this, HomeActivity::class.java)
+          val data = json.getJSONObject("data")
+          move.putExtra("balance", BigDecimal(data.getString("Balance")))
+          startActivity(move)
+        } else {
+          Toast.makeText(this, json.getString("data"), Toast.LENGTH_LONG).show()
+        }
       }
-      Toast.makeText(this, json.getString("data"), Toast.LENGTH_LONG).show()
+      else -> {
+        move = Intent(this, LoginActivity::class.java)
+        startActivity(move)
+      }
     }
-    move = Intent(this, LoginActivity::class.java)
-    startActivity(move)
   }
 
 }

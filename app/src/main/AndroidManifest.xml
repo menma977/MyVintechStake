@@ -17,7 +17,10 @@
       android:supportsRtl="true"
       android:theme="@style/AppTheme"
       tools:targetApi="n">
-    <activity android:name=".view.HomeActivity">
+    <activity
+        android:name=".view.HomeActivity"
+        android:configChanges="orientation|screenSize"
+        android:theme="@style/AppTheme.NoActionBar">
     </activity>
     <activity
         android:name=".LoginActivity"

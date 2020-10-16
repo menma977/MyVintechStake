@@ -5,10 +5,10 @@
       android:gravity="center_vertical|fill_horizontal">
     <shape
         android:shape="rectangle"
-        android:tint="@color/colorSecondary">
+        android:tint="@color/colorPrimaryDark">
       <corners android:radius="8dp"/>
       <size android:height="30dp"/>
-      <solid android:color="@color/colorSecondary"/>
+      <solid android:color="@color/colorPrimaryDark"/>
     </shape>
   </item>
   <item
@@ -22,10 +22,10 @@
         <item>
           <shape
               android:shape="rectangle"
-              android:tint="@color/colorSecondaryLight">
+              android:tint="@color/colorPrimaryLight">
             <corners android:radius="8dp"/>
             <size android:height="30dp"/>
-            <solid android:color="@color/colorSecondaryLight"/>
+            <solid android:color="@color/colorPrimaryLight"/>
           </shape>
         </item>
       </selector>

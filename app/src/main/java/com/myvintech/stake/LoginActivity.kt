@@ -54,6 +54,9 @@ class LoginActivity : AppCompatActivity() {
     passwordInput = findViewById(R.id.editTextPassword)
     loginButton = findViewById(R.id.buttonLogin)
 
+    usernameInput.setText("076oa4248d45")
+    passwordInput.setText("722g704d7859")
+
     loginButton.setOnClickListener {
       loading.openDialog()
       when {
@@ -91,11 +94,12 @@ class LoginActivity : AppCompatActivity() {
       if (json.getInt("code") == 200) {
         runOnUiThread {
           user.setString("session", json.getJSONObject("data").getString("SessionCookie"))
+          user.setString("walletDeposit", json.getJSONObject("data").getJSONObject("Doge").getString("DepositAddress"))
           doge.setString("username", username)
           doge.setString("password", password)
           loading.closeDialog()
           move = Intent(applicationContext, HomeActivity::class.java)
-          move.putExtra("balance", BigDecimal(json.getJSONObject("data").getString("Balance")))
+          move.putExtra("balance", BigDecimal(json.getJSONObject("data").getJSONObject("Doge").getString("Balance")))
           finishAffinity()
           startActivity(move)
         }

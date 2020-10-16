@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".view.HomeActivity"
     android:keepScreenOn="true"
-    android:background="@drawable/background">
+    android:background="@color/colorSecondaryDark">
 
   <LinearLayout
       android:layout_width="match_parent"
@@ -15,7 +15,7 @@
 
     <Space
         android:layout_width="match_parent"
-        android:layout_height="20dp"/>
+        android:layout_height="10dp"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -23,7 +23,8 @@
         android:orientation="vertical"
         android:background="@drawable/card"
         android:padding="10dp"
-        android:layout_margin="10dp">
+        android:layout_margin="10dp"
+        android:elevation="8dp">
 
       <TextView
           android:layout_width="match_parent"
@@ -42,7 +43,9 @@
       <LinearLayout
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:orientation="horizontal">
+          android:orientation="horizontal"
+          android:background="@drawable/edit_text"
+          android:padding="10dp">
 
         <TextView
             android:text="@string/balance"
@@ -72,17 +75,14 @@
 
     </LinearLayout>
 
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="20dp"/>
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_margin="10dp"
         android:padding="10dp"
-        android:background="@drawable/card">
+        android:background="@drawable/card"
+        android:elevation="10dp">
 
       <TextView
           android:layout_width="match_parent"
@@ -105,10 +105,12 @@
 
         <TextView
             android:text="@string/fund"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textColor="@color/colorPrimaryDark"
-            android:layout_marginEnd="10dp"/>
+            android:id="@+id/textViewProbability"
+            android:layout_marginEnd="10dp"
+            android:layout_weight="0.5"/>
 
         <TextView
             android:text="@string/fund"
@@ -116,7 +118,8 @@
             android:layout_height="wrap_content"
             android:id="@+id/textViewFund"
             android:layout_weight="1"
-            android:textColor="@color/colorAccent"/>
+            android:textColor="@color/colorAccent"
+            android:textAlignment="textEnd"/>
 
       </LinearLayout>
 
@@ -143,9 +146,9 @@
       <SeekBar
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:id="@+id/seekBarHigh"
-          android:max="10"
-          android:progress="5"
+          android:id="@+id/seekBar"
+          android:max="4"
+          android:progress="0"
           android:progressDrawable="@drawable/seekbar_style"
           android:thumb="@drawable/seekbar_thumb"/>
 
@@ -175,14 +178,71 @@
             android:layout_height="30dp"
             android:id="@+id/buttonStop"
             android:layout_weight="1"
-            android:background="@drawable/button_danger"
+            android:background="@drawable/button_warning"
             android:textColor="@color/textSecondary"
             tools:ignore="ButtonStyle"
             android:layout_marginStart="5dp"/>
 
       </LinearLayout>
 
+      <Space
+          android:layout_width="match_parent"
+          android:layout_height="10dp"/>
+
     </LinearLayout>
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="10dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp">
+
+      <Button
+          android:text="@string/deposit"
+          android:layout_width="0dp"
+          android:layout_height="30dp"
+          android:id="@+id/buttonDeposit"
+          android:layout_weight="1"
+          android:background="@drawable/button_primary"
+          android:textColor="@color/textSecondary"
+          android:layout_marginStart="5dp"
+          android:layout_marginEnd="5dp"
+          tools:ignore="ButtonStyle"/>
+
+      <Button
+          android:text="@string/withdraw_all"
+          android:layout_width="0dp"
+          android:layout_height="30dp"
+          android:id="@+id/buttonWithdrawAll"
+          android:layout_weight="1"
+          android:background="@drawable/button_info"
+          android:textColor="@color/textSecondary"
+          android:layout_marginStart="5dp"
+          android:layout_marginEnd="5dp"
+          tools:ignore="ButtonStyle"/>
+
+      <Button
+          android:text="@string/logout"
+          android:layout_width="0dp"
+          android:layout_height="30dp"
+          android:id="@+id/buttonLogout"
+          android:layout_weight="1"
+          android:background="@drawable/button_danger"
+          android:textColor="@color/textSecondary"
+          android:layout_marginStart="5dp"
+          android:layout_marginEnd="5dp"
+          tools:ignore="ButtonStyle"/>
+
+    </LinearLayout>
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="10dp"/>
 
     <LinearLayout
         android:layout_width="match_parent"
