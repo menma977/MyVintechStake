@@ -22,6 +22,7 @@ import com.myvintech.stake.controller.WebController
 import com.myvintech.stake.model.Doge
 import com.myvintech.stake.model.User
 import com.myvintech.stake.view.modal.CustomDialog
+import okhttp3.FormBody
 import org.json.JSONObject
 import java.math.BigDecimal
 import java.util.*
@@ -62,8 +63,8 @@ class HomeActivity : AppCompatActivity() {
   private var payInMultiple: BigDecimal = BigDecimal(1)
   private var high = BigDecimal(0)
   private var seed = (0..99999).random().toString()
-  private var body = HashMap<String, String>()
   private var maxRow = 10
+  private var isWin = false
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -76,10 +77,6 @@ class HomeActivity : AppCompatActivity() {
     percentTable = ArrayList()
     setListTargetMaximum()
     loading.openDialog()
-
-    balance = intent.getSerializableExtra("balance") as BigDecimal
-    maxBalance = bitCoinFormat.dogeToDecimal(bitCoinFormat.decimalToDoge(balance).multiply(BigDecimal(0.01))).multiply(percentTable[high.toInt() + 1].toBigDecimal())
-    payIn = balance.multiply(BigDecimal(0.01))
 
     textUsername = findViewById(R.id.textViewUsername)
     textBalance = findViewById(R.id.textViewBalance)
@@ -98,15 +95,14 @@ class HomeActivity : AppCompatActivity() {
     resultLinearLayout = findViewById(R.id.linearLayoutResult)
     statusLinearLayout = findViewById(R.id.linearLayoutStatus)
 
-    textUsername.text = Security.decrypt(user.getString("username"))
-    textBalance.text = BitCoinFormat.decimalToDoge(balance).toPlainString()
-    textFund.text = "Maximum : ${bitCoinFormat.decimalToDoge(maxBalance).toPlainString()}"
-    textProbability.text = "Possibility: ${(high + BigDecimal(5)) * BigDecimal(10)}%"
-
-    walletDeposit = user.getString("walletDeposit")
-    walletWithdraw = user.getString("walletWithdraw")
-
     setDefaultView()
+
+    if (user.getBoolean("isStake")) {
+      buttonStake.visibility = Button.GONE
+      buttonStop.visibility = Button.GONE
+    } else if (user.getString("status") == "WIN") {
+      buttonStake.visibility = Button.GONE
+    }
 
     buttonDespot.setOnClickListener {
       CustomDialog.deposit(this, walletDeposit)
@@ -114,10 +110,10 @@ class HomeActivity : AppCompatActivity() {
 
     buttonLogout.setOnClickListener {
       loading.openDialog()
-      user.clear()
-      doge.clear()
       Timer().schedule(1000) {
         WebController.Get("user.logout", user.getString("token")).call()
+        user.clear()
+        doge.clear()
         move = Intent(applicationContext, MainActivity::class.java)
         runOnUiThread {
           startActivity(move)
@@ -129,11 +125,11 @@ class HomeActivity : AppCompatActivity() {
 
     seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
       override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-        high = BigDecimal(progress + 1)
+        high = BigDecimal(progress)
         percent = percentTable[progress]
         maxBalance = bitCoinFormat.dogeToDecimal(bitCoinFormat.decimalToDoge(payIn.multiply(percent.toBigDecimal())).multiply(payInMultiple))
         textFund.text = "Maximum : ${bitCoinFormat.decimalToDoge(maxBalance).toPlainString()}"
-        textProbability.text = "Possibility: ${high.toInt() * 10}%"
+        textProbability.text = "Possibility: ${(high.toInt() + 1) * 10}%"
       }
 
       override fun onStartTrackingTouch(seekBar: SeekBar) {}
@@ -141,28 +137,57 @@ class HomeActivity : AppCompatActivity() {
     })
 
     buttonStake.setOnClickListener {
-      if (editTextAmount.text.isEmpty()) {
-        Popup(this).show("Amount required", Toast.LENGTH_SHORT)
-      } else {
-        payIn = bitCoinFormat.dogeToDecimal(editTextAmount.text.toString().toBigDecimal())
-        onBot()
+      when {
+        editTextAmount.text.isEmpty() -> {
+          Popup(this).show("Amount required", Toast.LENGTH_SHORT)
+        }
+        bitCoinFormat.dogeToDecimal(editTextAmount.text.toString().toBigDecimal()) > maxBalance -> {
+          Toast.makeText(this, "Doge you can input should not be more than ${bitCoinFormat.decimalToDoge(maxBalance).toPlainString()}", Toast.LENGTH_LONG).show()
+        }
+        else -> {
+          payIn = bitCoinFormat.dogeToDecimal(editTextAmount.text.toString().toBigDecimal())
+          onBot()
+        }
       }
     }
+
+    walletDeposit = user.getString("walletDeposit")
+    walletWithdraw = user.getString("walletWithdraw")
+
+    balance = intent.getSerializableExtra("balance") as BigDecimal
+    if (user.getBoolean("stake")) {
+      payIn = user.getString("fund").toBigDecimal()
+      high = user.getString("possibility").toBigDecimal()
+      seekBar.progress = user.getString("possibility").toInt()
+      maxBalance = bitCoinFormat.dogeToDecimal(bitCoinFormat.decimalToDoge(payIn).multiply(BigDecimal(0.01))).multiply(percentTable[high.toInt() + 1].toBigDecimal())
+      if (user.getString("status").contains("WIN")) {
+        isWin = true
+      }
+    } else {
+      maxBalance = bitCoinFormat.dogeToDecimal(bitCoinFormat.decimalToDoge(balance).multiply(BigDecimal(0.01))).multiply(percentTable[high.toInt() + 1].toBigDecimal())
+      payIn = balance.multiply(BigDecimal(0.01))
+    }
+
+    textUsername.text = Security.decrypt(user.getString("username"))
+    textBalance.text = BitCoinFormat.decimalToDoge(balance).toPlainString()
+    textFund.text = "Maximum : ${bitCoinFormat.decimalToDoge(maxBalance).toPlainString()}"
+    textProbability.text = "Possibility: ${(high + BigDecimal(5)) * BigDecimal(10)}%"
 
     loading.closeDialog()
   }
 
   private fun onBot() {
+    val body = FormBody.Builder()
     loading.openDialog()
     Timer().schedule(100) {
-      body["a"] = "PlaceBet"
-      body["s"] = user.getString("session")
-      body["Low"] = "0"
-      body["High"] = ((high + BigDecimal(1)).multiply(BigDecimal(10)).multiply(BigDecimal(10000)) - BigDecimal(600)).toPlainString()
-      body["PayIn"] = payIn.toPlainString()
-      body["ProtocolVersion"] = "2"
-      body["ClientSeed"] = seed
-      body["Currency"] = "doge"
+      body.addEncoded("a", "PlaceBet")
+      body.addEncoded("s", user.getString("session"))
+      body.addEncoded("Low", "0")
+      body.addEncoded("High", ((high + BigDecimal(1)).multiply(BigDecimal(10)).multiply(BigDecimal(10000)) - BigDecimal(600)).toPlainString())
+      body.addEncoded("PayIn", payIn.toPlainString())
+      body.addEncoded("ProtocolVersion", "2")
+      body.addEncoded("ClientSeed", seed)
+      body.addEncoded("Currency", "doge")
       json = DogeController(body).call()
       loading.closeDialog()
       if (json.getInt("code") == 200) {
@@ -177,6 +202,10 @@ class HomeActivity : AppCompatActivity() {
           balance = balanceRemaining
           textBalance.text = bitCoinFormat.decimalToDoge(balance).toPlainString()
 
+          body.addEncoded("fund", payIn.toPlainString())
+          body.addEncoded("possibility", seekBar.progress.toString())
+          body.addEncoded("result", puyOut.toPlainString())
+
           setView(bitCoinFormat.decimalToDoge(payIn).toPlainString(), fundLinearLayout, false, winBot)
           setView("${(seekBar.progress + 1) * 10}%", highLinearLayout, false, winBot)
           setView(bitCoinFormat.decimalToDoge(puyOut).toPlainString(), resultLinearLayout, false, winBot)
@@ -185,6 +214,8 @@ class HomeActivity : AppCompatActivity() {
             buttonStake.visibility = Button.GONE
             textStatus.text = "WIN"
             textStatus.setTextColor(getColor(R.color.Success))
+            body.addEncoded("stop", "true")
+            body.addEncoded("status", "WIN")
           } else {
             setView("LOSE", statusLinearLayout, false, winBot)
             textStatus.text = "LOSE"
@@ -197,10 +228,16 @@ class HomeActivity : AppCompatActivity() {
             editTextAmount.isEnabled = true
 
             seekBar.progress = seekBar.progress + 1
+            body.addEncoded("stop", "false")
+            body.addEncoded("status", "LOSE")
           }
-
-          editTextAmount.setText("")
-          loading.closeDialog()
+          Timer().schedule(100) {
+            WebController.Post("stake.store", user.getString("token"), body).call()
+            runOnUiThread {
+              editTextAmount.setText("")
+              loading.closeDialog()
+            }
+          }
         }
       } else {
         runOnUiThread {
@@ -289,21 +326,46 @@ class HomeActivity : AppCompatActivity() {
   private var getUserService: BroadcastReceiver = object : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
       if (intent.getBooleanExtra("isLogout", false)) {
-        loading.openDialog()
-        user.clear()
-        doge.clear()
         Timer().schedule(1000) {
           WebController.Get("user.logout", user.getString("token")).call()
+          user.clear()
+          doge.clear()
           move = Intent(applicationContext, MainActivity::class.java)
           runOnUiThread {
             startActivity(move)
-            loading.closeDialog()
             finishAffinity()
           }
         }
       } else {
         walletDeposit = intent.getStringExtra("walletDeposit").toString()
         walletWithdraw = intent.getStringExtra("walletWithdraw").toString()
+
+        if (intent.getBooleanExtra("stake", false)) {
+          payIn = intent.getSerializableExtra("fund") as BigDecimal
+          high = intent.getSerializableExtra("possibility") as BigDecimal
+          seekBar.progress = BigDecimal(intent.getSerializableExtra("possibility").toString()).toInt()
+          maxBalance = bitCoinFormat.dogeToDecimal(bitCoinFormat.decimalToDoge(payIn).multiply(BigDecimal(0.01))).multiply(percentTable[high.toInt() + 1].toBigDecimal())
+          if (user.getString("status").contains("WIN")) {
+            isWin = true
+          }
+        } else {
+          maxBalance = bitCoinFormat.dogeToDecimal(bitCoinFormat.decimalToDoge(balance).multiply(BigDecimal(0.01))).multiply(percentTable[high.toInt() + 1].toBigDecimal())
+          payIn = balance.multiply(BigDecimal(0.01))
+        }
+
+        textUsername.text = Security.decrypt(user.getString("username"))
+        textBalance.text = BitCoinFormat.decimalToDoge(balance).toPlainString()
+        val viewFund = "Maximum : ${bitCoinFormat.decimalToDoge(maxBalance).toPlainString()}"
+        textFund.text = viewFund
+        val viewProbability = "Possibility: ${(high + BigDecimal(5)) * BigDecimal(10)}%"
+        textProbability.text = viewProbability
+
+        if (user.getBoolean("isStake")) {
+          buttonStake.visibility = Button.GONE
+          buttonStop.visibility = Button.GONE
+        } else if (user.getString("status") == "WIN") {
+          buttonStake.visibility = Button.GONE
+        }
       }
     }
   }

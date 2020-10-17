@@ -1,18 +1,17 @@
 package com.myvintech.stake
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.myvintech.stake.controller.DogeController
 import com.myvintech.stake.model.Doge
 import com.myvintech.stake.model.User
 import com.myvintech.stake.view.HomeActivity
+import okhttp3.FormBody
 import org.json.JSONObject
 import java.math.BigDecimal
 import java.util.*
-import java.util.concurrent.Executors
-import kotlin.collections.HashMap
 import kotlin.concurrent.schedule
 
 class MainActivity : AppCompatActivity() {
@@ -28,17 +27,18 @@ class MainActivity : AppCompatActivity() {
       when {
         cookie.isNotEmpty() -> {
           val doge = Doge(applicationContext)
-          val body = HashMap<String, String>()
-          body["a"] = "GetBalance"
-          body["key"] = doge.tokenDoge()
-          body["s"] = cookie
-          body["Currency"] = "doge"
+          val body = FormBody.Builder()
+          body.addEncoded("a", "GetBalance")
+          body.addEncoded("key", doge.tokenDoge())
+          body.addEncoded("s", cookie)
+          body.addEncoded("Currency", "doge")
           json = DogeController(body).call()
           if (json.getInt("code") == 200) {
             move = Intent(applicationContext, HomeActivity::class.java)
             val data = json.getJSONObject("data")
             move.putExtra("balance", BigDecimal(data.getString("Balance")))
             startActivity(move)
+            finishAffinity()
           } else {
             Toast.makeText(applicationContext, json.getString("data"), Toast.LENGTH_LONG).show()
           }
@@ -46,6 +46,7 @@ class MainActivity : AppCompatActivity() {
         else -> {
           move = Intent(applicationContext, LoginActivity::class.java)
           startActivity(move)
+          finishAffinity()
         }
       }
     }

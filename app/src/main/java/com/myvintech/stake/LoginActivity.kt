@@ -17,10 +17,11 @@ import com.myvintech.stake.controller.WebController
 import com.myvintech.stake.model.Doge
 import com.myvintech.stake.model.User
 import com.myvintech.stake.view.HomeActivity
+import okhttp3.FormBody
 import org.json.JSONObject
+import java.lang.Exception
 import java.math.BigDecimal
 import java.util.*
-import kotlin.collections.HashMap
 import kotlin.concurrent.schedule
 
 class LoginActivity : AppCompatActivity() {
@@ -34,7 +35,6 @@ class LoginActivity : AppCompatActivity() {
   private lateinit var passwordInput: EditText
   private lateinit var loginButton: Button
   private lateinit var json: JSONObject
-  private var body = HashMap<String, String>()
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -82,20 +82,36 @@ class LoginActivity : AppCompatActivity() {
   }
 
   private fun onLogin(username: String, password: String) {
-    body["username"] = username
-    body["password"] = password
+    val body = FormBody.Builder()
+    body.addEncoded("username", username)
+    body.addEncoded("password", password)
     Timer().schedule(500) {
       json = WebController.Post("login", "", body).call()
+      println(json)
       if (json.getInt("code") == 200) {
         runOnUiThread {
           user.setString("token", json.getJSONObject("data").getString("token"))
           user.setString("session", json.getJSONObject("data").getString("session"))
           user.setString("walletDeposit", json.getJSONObject("data").getString("walletDeposit"))
           user.setString("walletWithdraw", json.getJSONObject("data").getString("walletWithdraw"))
+          user.setBoolean("isStake", json.getJSONObject("data").getBoolean("isStake"))
+          try {
+            user.setBoolean("stake", true)
+            user.setString("fund", json.getJSONObject("data").getJSONObject("lastStake").getString("fund"))
+            user.setString("possibility", json.getJSONObject("data").getJSONObject("lastStake").getString("possibility"))
+            user.setString("result", json.getJSONObject("data").getJSONObject("lastStake").getString("result"))
+            user.setString("status", json.getJSONObject("data").getJSONObject("lastStake").getString("status"))
+          } catch (e: Exception) {
+            user.setBoolean("stake", false)
+            user.setString("fund", "")
+            user.setString("possibility", "")
+            user.setString("result", "")
+            user.setString("status", "LOSE")
+          }
           doge.setString("username", username)
           doge.setString("password", password)
-          loading.closeDialog()
           move = Intent(applicationContext, HomeActivity::class.java)
+          loading.closeDialog()
           move.putExtra("balance", BigDecimal(json.getJSONObject("data").getString("balance")))
           startActivity(move)
           finishAffinity()

@@ -8,6 +8,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.myvintech.stake.controller.DogeController
 import com.myvintech.stake.model.Doge
 import com.myvintech.stake.model.User
+import okhttp3.FormBody
 import org.json.JSONObject
 import java.lang.Exception
 import java.math.BigDecimal
@@ -36,21 +37,21 @@ class ServiceGetBalance : Service() {
     val cookie = user.getString("session")
     var time = System.currentTimeMillis()
     val trigger = Object()
-    val body = HashMap<String, String>()
 
     Timer().schedule(100) {
-      synchronized(trigger) {
-        while (true) {
-          val delta = System.currentTimeMillis() - time
-          if (delta >= 15000) {
-            time = System.currentTimeMillis()
-            val privateIntent = Intent()
-            if (startBackgroundService) {
+      while (true) {
+        val delta = System.currentTimeMillis() - time
+        if (delta >= 15000) {
+          time = System.currentTimeMillis()
+          val privateIntent = Intent()
+          if (startBackgroundService) {
+            synchronized(trigger) {
               try {
-                body["a"] = "GetBalance"
-                body["key"] = doge.tokenDoge()
-                body["s"] = cookie
-                body["Currency"] = "doge"
+                val body = FormBody.Builder()
+                body.addEncoded("a", "GetBalance")
+                body.addEncoded("key", doge.tokenDoge())
+                body.addEncoded("s", cookie)
+                body.addEncoded("Currency", "doge")
                 json = DogeController(body).call()
                 if (json.getInt("code") == 200) {
                   if (json.getJSONObject("data").getString("Balance").isEmpty()) {
@@ -66,9 +67,9 @@ class ServiceGetBalance : Service() {
               } catch (e: Exception) {
                 Log.w("error", e.message.toString())
               }
-            } else {
-              break
             }
+          } else {
+            break
           }
         }
       }

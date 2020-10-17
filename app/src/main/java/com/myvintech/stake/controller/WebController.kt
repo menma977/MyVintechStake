@@ -1,12 +1,9 @@
 package com.myvintech.stake.controller
 
-import com.myvintech.stake.config.MapToJson
 import com.myvintech.stake.model.Url
-import okhttp3.MediaType
-import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import org.json.JSONObject
 import java.io.BufferedReader
@@ -16,15 +13,13 @@ import java.util.concurrent.TimeUnit
 
 @Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
 class WebController {
-  class Post(private var targetUrl: String, private var token: String, private var bodyValue: HashMap<String, String>) : Callable<JSONObject> {
+  class Post(private var targetUrl: String, private var token: String, private var bodyValue: FormBody.Builder) : Callable<JSONObject> {
     override fun call(): JSONObject {
       return try {
         val client = OkHttpClient.Builder().connectTimeout(30, TimeUnit.SECONDS).writeTimeout(30, TimeUnit.SECONDS).readTimeout(30, TimeUnit.SECONDS).build()
-        val mediaType: MediaType = "application/x-www-form-urlencoded".toMediaType()
-        val body = MapToJson().map(bodyValue).toRequestBody(mediaType)
         val request = Request.Builder()
         request.url(Url.web() + targetUrl.replace(".", "/"))
-        request.post(body)
+        request.post(bodyValue.build())
         if (token.isNotEmpty()) {
           request.addHeader("Authorization", "Bearer $token")
         }
