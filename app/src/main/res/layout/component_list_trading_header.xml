@@ -10,11 +10,16 @@
     android:weightSum="15">
 
 
-    <ImageView
+    <TextView
         android:id="@+id/status"
-        android:layout_width="20dp"
+        android:layout_width="50dp"
         android:layout_height="wrap_content"
-        android:baselineAlignBottom="false" />
+        android:baselineAlignBottom="false"
+        android:padding="2sp"
+        android:text="Status"
+        android:textAlignment="center"
+        android:textColor="@color/textSecondary"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/fund"

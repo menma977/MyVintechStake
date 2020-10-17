@@ -1,22 +1,25 @@
 package com.myvintech.stake.view.adapter
 
 //import com.myvintech.stake.R
-import android.content.ClipData.Item
+import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.myvintech.stake.R
 import com.myvintech.stake.model.TradingResult
 import java.math.BigDecimal
 
 
-class TradingListAdapter(private val myDataset: ArrayList<TradingResult>) :
+class TradingListAdapter(private val context: Context, private val myDataset: ArrayList<TradingResult>) :
     RecyclerView.Adapter<TradingListAdapter.MyViewHolder>() {
 
+    private var max: Int = 20
     init {
         myDataset.add(0, TradingResult(BigDecimal.ZERO,0, BigDecimal.ZERO, false))
     }
@@ -25,7 +28,7 @@ class TradingListAdapter(private val myDataset: ArrayList<TradingResult>) :
         val fund:TextView = layout.findViewById(R.id.fund)
         val high:TextView = layout.findViewById(R.id.high)
         val result:TextView = layout.findViewById(R.id.result)
-        val status:ImageView = layout.findViewById(R.id.status)
+        val status:TextView = layout.findViewById(R.id.status)
     }
 
     class MyViewHolderHeader(val layout: View) : RecyclerView.ViewHolder(layout){}
@@ -46,6 +49,14 @@ class TradingListAdapter(private val myDataset: ArrayList<TradingResult>) :
         }
     }
 
+    fun setMax(max: Int) {
+        this.max = max
+    }
+
+    fun getMax(): Int{
+        return max
+    }
+
     override fun getItemViewType(position: Int): Int {
         return if(position == 0) 0 else 1
     }
@@ -55,11 +66,13 @@ class TradingListAdapter(private val myDataset: ArrayList<TradingResult>) :
         holder.fund.text = myDataset[position].fund.toPlainString() + "DOGE"
         holder.high.text = myDataset[position].high.toString()+"%"
         holder.result.text = myDataset[position].result.toPlainString() + "DOGE"
-        holder.status.setImageResource(
-            if (myDataset[position].status)
-                android.R.drawable.btn_star_big_on
-            else android.R.drawable.btn_star_big_off
-        )
+        if(!myDataset[position].status){
+            holder.status.text = "LOSE"
+            holder.status.setTextColor(ContextCompat.getColor(context, R.color.Danger))
+        }else{
+            holder.status.text = "WIN"
+            holder.status.setTextColor(ContextCompat.getColor(context, R.color.Success))
+        }
     }
 
     override fun getItemCount() = myDataset.size

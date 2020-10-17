@@ -10,12 +10,15 @@
     android:weightSum="15">
 
 
-    <ImageView
+    <TextView
         android:id="@+id/status"
-        android:layout_width="20dp"
+        android:layout_width="50dp"
         android:layout_height="wrap_content"
         android:baselineAlignBottom="false"
-        app:srcCompat="@android:drawable/btn_star_big_on" />
+        android:text="WIN"
+        android:textColor="@color/Success"
+        app:srcCompat="@android:drawable/btn_star_big_on"
+        android:textAlignment="center" />
 
     <TextView
         android:id="@+id/fund"

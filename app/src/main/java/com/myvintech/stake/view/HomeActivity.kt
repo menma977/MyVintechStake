@@ -110,35 +110,16 @@ class HomeActivity : AppCompatActivity() {
     resultLinearLayout = findViewById(R.id.linearLayoutResult)
     statusLinearLayout = findViewById(R.id.linearLayoutStatus)
      */
-    myDataset.add(TradingResult(BigDecimal.ZERO,3, BigDecimal.TEN,true))
-    myDataset.add(TradingResult(BigDecimal.ZERO,3, BigDecimal.ZERO,true))
-    myDataset.add(TradingResult(BigDecimal.ZERO,3, BigDecimal.TEN,true))
     viewManager = LinearLayoutManager(this)
-    listTradingAdapter = TradingListAdapter(myDataset)
+    listTradingAdapter = TradingListAdapter(applicationContext, myDataset)
     tradingList = findViewById<RecyclerView>(R.id.tradinglist).apply {
       layoutManager = viewManager
       adapter = listTradingAdapter
     }
     Log.d("LOL2","AAAA")
 
-    listTradingAdapter.addItem(TradingResult(BigDecimal.ZERO,3, BigDecimal.ZERO,true))
-    listTradingAdapter.addItem(TradingResult(BigDecimal.ZERO,3, BigDecimal.TEN,true))
-    listTradingAdapter.addItem(TradingResult(BigDecimal.ZERO,3, BigDecimal.ZERO,true))
-    listTradingAdapter.addItem(TradingResult(BigDecimal.ZERO,3, BigDecimal.TEN,true))
-    listTradingAdapter.addItem(TradingResult(BigDecimal.ZERO,3, BigDecimal.ZERO,true))
-    listTradingAdapter.addItem(TradingResult(BigDecimal.ZERO,3, BigDecimal.TEN,true))
-    listTradingAdapter.addItem(TradingResult(BigDecimal.ZERO,3, BigDecimal.ZERO,true))
-    listTradingAdapter.addItem(TradingResult(BigDecimal.ZERO,3, BigDecimal.TEN,true))
-    listTradingAdapter.addItem(TradingResult(BigDecimal.ZERO,3, BigDecimal.ZERO,true))
-    listTradingAdapter.addItem(TradingResult(BigDecimal.ZERO,3, BigDecimal.TEN,true))
-    listTradingAdapter.addItem(TradingResult(BigDecimal.ZERO,3, BigDecimal.ZERO,true))
-    listTradingAdapter.addItem(TradingResult(BigDecimal.ZERO,3, BigDecimal.TEN,true))
-    listTradingAdapter.addItem(TradingResult(BigDecimal.ZERO,3, BigDecimal.ZERO,true))
-    listTradingAdapter.addItem(TradingResult(BigDecimal.ZERO,3, BigDecimal.TEN,true))
-    listTradingAdapter.addItem(TradingResult(BigDecimal.ZERO,3, BigDecimal.ZERO,true))
-    listTradingAdapter.addItem(TradingResult(BigDecimal.ZERO,3, BigDecimal.TEN,true))
-    listTradingAdapter.addItem(TradingResult(BigDecimal.ZERO,3, BigDecimal.ZERO,true))
-    listTradingAdapter.addItem(TradingResult(BigDecimal.ZERO,3, BigDecimal.TEN,true))
+    for (i in 1..20)
+      listTradingAdapter.addItem(TradingResult(BigDecimal.valueOf(i+0.1),3, BigDecimal.ZERO,i%2==0))
 
     // setDefaultView()
 
