@@ -5,10 +5,13 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
-import android.view.Gravity
+import android.util.Log
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.myvintech.stake.MainActivity
 import com.myvintech.stake.R
 import com.myvintech.stake.background.ServiceGetBalance
@@ -20,12 +23,15 @@ import com.myvintech.stake.config.Security
 import com.myvintech.stake.controller.DogeController
 import com.myvintech.stake.controller.WebController
 import com.myvintech.stake.model.Doge
+import com.myvintech.stake.model.TradingResult
 import com.myvintech.stake.model.User
+import com.myvintech.stake.view.adapter.TradingListAdapter
 import com.myvintech.stake.view.modal.CustomDialog
 import okhttp3.FormBody
 import org.json.JSONObject
 import java.math.BigDecimal
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.concurrent.schedule
 
 class HomeActivity : AppCompatActivity() {
@@ -49,10 +55,16 @@ class HomeActivity : AppCompatActivity() {
   private lateinit var bitCoinFormat: BitCoinFormat
   private lateinit var percentTable: ArrayList<Double>
   private lateinit var json: JSONObject
+  /*
   private lateinit var fundLinearLayout: LinearLayout
   private lateinit var highLinearLayout: LinearLayout
   private lateinit var resultLinearLayout: LinearLayout
   private lateinit var statusLinearLayout: LinearLayout
+   */
+  private lateinit var tradingList: RecyclerView
+  private lateinit var listTradingAdapter: TradingListAdapter
+  private lateinit var viewManager: RecyclerView.LayoutManager
+
   private lateinit var webApiIntent: Intent
   private lateinit var dogeApiIntent: Intent
   private lateinit var walletDeposit: String
@@ -65,6 +77,8 @@ class HomeActivity : AppCompatActivity() {
   private var seed = (0..99999).random().toString()
   private var maxRow = 10
   private var isWin = false
+
+  private val myDataset = ArrayList<TradingResult>()
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -90,12 +104,43 @@ class HomeActivity : AppCompatActivity() {
     buttonWithdrawAll = findViewById(R.id.buttonWithdrawAll)
     buttonLogout = findViewById(R.id.buttonLogout)
     editTextAmount = findViewById(R.id.editTextAmount)
+    /*
     fundLinearLayout = findViewById(R.id.linearLayoutFund)
     highLinearLayout = findViewById(R.id.linearLayoutHigh)
     resultLinearLayout = findViewById(R.id.linearLayoutResult)
     statusLinearLayout = findViewById(R.id.linearLayoutStatus)
+     */
+    myDataset.add(TradingResult(BigDecimal.ZERO,3, BigDecimal.TEN,true))
+    myDataset.add(TradingResult(BigDecimal.ZERO,3, BigDecimal.ZERO,true))
+    myDataset.add(TradingResult(BigDecimal.ZERO,3, BigDecimal.TEN,true))
+    viewManager = LinearLayoutManager(this)
+    listTradingAdapter = TradingListAdapter(myDataset)
+    tradingList = findViewById<RecyclerView>(R.id.tradinglist).apply {
+      layoutManager = viewManager
+      adapter = listTradingAdapter
+    }
+    Log.d("LOL2","AAAA")
 
-    setDefaultView()
+    listTradingAdapter.addItem(TradingResult(BigDecimal.ZERO,3, BigDecimal.ZERO,true))
+    listTradingAdapter.addItem(TradingResult(BigDecimal.ZERO,3, BigDecimal.TEN,true))
+    listTradingAdapter.addItem(TradingResult(BigDecimal.ZERO,3, BigDecimal.ZERO,true))
+    listTradingAdapter.addItem(TradingResult(BigDecimal.ZERO,3, BigDecimal.TEN,true))
+    listTradingAdapter.addItem(TradingResult(BigDecimal.ZERO,3, BigDecimal.ZERO,true))
+    listTradingAdapter.addItem(TradingResult(BigDecimal.ZERO,3, BigDecimal.TEN,true))
+    listTradingAdapter.addItem(TradingResult(BigDecimal.ZERO,3, BigDecimal.ZERO,true))
+    listTradingAdapter.addItem(TradingResult(BigDecimal.ZERO,3, BigDecimal.TEN,true))
+    listTradingAdapter.addItem(TradingResult(BigDecimal.ZERO,3, BigDecimal.ZERO,true))
+    listTradingAdapter.addItem(TradingResult(BigDecimal.ZERO,3, BigDecimal.TEN,true))
+    listTradingAdapter.addItem(TradingResult(BigDecimal.ZERO,3, BigDecimal.ZERO,true))
+    listTradingAdapter.addItem(TradingResult(BigDecimal.ZERO,3, BigDecimal.TEN,true))
+    listTradingAdapter.addItem(TradingResult(BigDecimal.ZERO,3, BigDecimal.ZERO,true))
+    listTradingAdapter.addItem(TradingResult(BigDecimal.ZERO,3, BigDecimal.TEN,true))
+    listTradingAdapter.addItem(TradingResult(BigDecimal.ZERO,3, BigDecimal.ZERO,true))
+    listTradingAdapter.addItem(TradingResult(BigDecimal.ZERO,3, BigDecimal.TEN,true))
+    listTradingAdapter.addItem(TradingResult(BigDecimal.ZERO,3, BigDecimal.ZERO,true))
+    listTradingAdapter.addItem(TradingResult(BigDecimal.ZERO,3, BigDecimal.TEN,true))
+
+    // setDefaultView()
 
     if (user.getBoolean("isStake")) {
       buttonStake.visibility = Button.GONE
@@ -206,20 +251,28 @@ class HomeActivity : AppCompatActivity() {
           body.addEncoded("possibility", seekBar.progress.toString())
           body.addEncoded("result", puyOut.toPlainString())
 
+          /*
           setView(bitCoinFormat.decimalToDoge(payIn).toPlainString(), fundLinearLayout, false, winBot)
           setView("${(seekBar.progress + 1) * 10}%", highLinearLayout, false, winBot)
           setView(bitCoinFormat.decimalToDoge(puyOut).toPlainString(), resultLinearLayout, false, winBot)
+           */
+
+          listTradingAdapter.addItem(TradingResult(bitCoinFormat.decimalToDoge(payIn),
+            (seekBar.progress + 1) * 10,
+            bitCoinFormat.decimalToDoge(puyOut),
+            winBot));
+
           if (winBot) {
-            setView("WIN", statusLinearLayout, false, winBot)
+            //setView("WIN", statusLinearLayout, false, winBot)
             buttonStake.visibility = Button.GONE
             textStatus.text = "WIN"
-            textStatus.setTextColor(getColor(R.color.Success))
+            textStatus.setTextColor(ContextCompat.getColor(applicationContext,R.color.Success))
             body.addEncoded("stop", "true")
             body.addEncoded("status", "WIN")
           } else {
-            setView("LOSE", statusLinearLayout, false, winBot)
+            //setView("LOSE", statusLinearLayout, false, winBot)
             textStatus.text = "LOSE"
-            textStatus.setTextColor(getColor(R.color.Danger))
+            textStatus.setTextColor(ContextCompat.getColor(applicationContext,R.color.Danger))
 
             payInMultiple = BigDecimal(2)
 
@@ -248,6 +301,7 @@ class HomeActivity : AppCompatActivity() {
     }
   }
 
+  /*
   private fun setDefaultView() {
     setView("Fund", fundLinearLayout, isNew = true, isWin = false)
     setView("Possibility", highLinearLayout, isNew = true, isWin = false)
@@ -261,6 +315,7 @@ class HomeActivity : AppCompatActivity() {
       setView("", statusLinearLayout, isNew = true, isWin = false)
     }
   }
+  */
 
   private fun setListTargetMaximum() {
     percentTable.add(1.0)
@@ -270,6 +325,7 @@ class HomeActivity : AppCompatActivity() {
     percentTable.add(9.0)
   }
 
+  /*
   private fun setView(value: String, linearLayout: LinearLayout, isNew: Boolean, isWin: Boolean) {
     val template = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
     val valueView = TextView(applicationContext)
@@ -277,14 +333,14 @@ class HomeActivity : AppCompatActivity() {
     valueView.gravity = Gravity.CENTER
     valueView.layoutParams = template
     if (isNew) {
-      valueView.setTextColor(getColor(R.color.colorAccent))
+      valueView.setTextColor(ContextCompat.getColor(applicationContext,R.color.colorAccent))
     } else {
       if (isWin) {
-        valueView.setTextColor(getColor(R.color.Success))
+        valueView.setTextColor(ContextCompat.getColor(applicationContext,R.color.Success))
         buttonStake.visibility = Button.GONE
         user.setBoolean("isWin", true)
       } else {
-        valueView.setTextColor(getColor(R.color.Danger))
+        valueView.setTextColor(ContextCompat.getColor(applicationContext,R.color.Danger))
       }
     }
 
@@ -295,6 +351,7 @@ class HomeActivity : AppCompatActivity() {
       linearLayout.addView(valueView)
     }
   }
+   */
 
   override fun onStart() {
     super.onStart()

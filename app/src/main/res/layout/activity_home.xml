@@ -244,45 +244,56 @@
         android:layout_width="match_parent"
         android:layout_height="10dp"/>
 
-    <LinearLayout
+    <!--LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:layout_margin="10dp"
-        android:elevation="5dp"
-        android:padding="15dp"
         android:background="@drawable/card"
-        android:baselineAligned="false">
+        android:baselineAligned="false"
+        android:elevation="5dp"
+        android:orientation="horizontal"
+        android:padding="15dp">
 
       <LinearLayout
           android:id="@+id/linearLayoutFund"
           android:layout_width="0dp"
           android:layout_height="wrap_content"
-          android:orientation="vertical"
-          android:layout_weight="1"/>
+          android:layout_weight="1"
+          android:orientation="vertical" />
 
       <LinearLayout
           android:id="@+id/linearLayoutHigh"
           android:layout_width="0dp"
           android:layout_height="wrap_content"
-          android:orientation="vertical"
-          android:layout_weight="1"/>
+          android:layout_weight="1"
+          android:orientation="vertical" />
 
       <LinearLayout
           android:id="@+id/linearLayoutResult"
           android:layout_width="0dp"
           android:layout_height="wrap_content"
-          android:orientation="vertical"
-          android:layout_weight="1"/>
+          android:layout_weight="1"
+          android:orientation="vertical" />
 
       <LinearLayout
           android:id="@+id/linearLayoutStatus"
           android:layout_width="0dp"
           android:layout_height="wrap_content"
-          android:orientation="vertical"
-          android:layout_weight="1"/>
+          android:layout_weight="1"
+          android:orientation="vertical" />
 
-    </LinearLayout>
+    </LinearLayout-->
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/tradinglist"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="10dp"
+        android:background="@drawable/card"
+        android:baselineAligned="false"
+        android:elevation="5dp"
+        android:orientation="horizontal"
+        android:padding="15dp" />
 
   </LinearLayout>
 
