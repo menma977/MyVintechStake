@@ -1,17 +1,24 @@
 package com.myvintech.stake.view
 
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.view.Gravity
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.myvintech.stake.MainActivity
 import com.myvintech.stake.R
+import com.myvintech.stake.background.ServiceGetBalance
+import com.myvintech.stake.background.ServiceGetUser
 import com.myvintech.stake.config.BitCoinFormat
 import com.myvintech.stake.config.Loading
 import com.myvintech.stake.config.Popup
 import com.myvintech.stake.config.Security
 import com.myvintech.stake.controller.DogeController
+import com.myvintech.stake.controller.WebController
 import com.myvintech.stake.model.Doge
 import com.myvintech.stake.model.User
 import com.myvintech.stake.view.modal.CustomDialog
@@ -45,6 +52,10 @@ class HomeActivity : AppCompatActivity() {
   private lateinit var highLinearLayout: LinearLayout
   private lateinit var resultLinearLayout: LinearLayout
   private lateinit var statusLinearLayout: LinearLayout
+  private lateinit var webApiIntent: Intent
+  private lateinit var dogeApiIntent: Intent
+  private lateinit var walletDeposit: String
+  private lateinit var walletWithdraw: String
   private var percent = 1.0
   private var maxBalance = BigDecimal(0)
   private var payIn: BigDecimal = BigDecimal(0)
@@ -92,21 +103,25 @@ class HomeActivity : AppCompatActivity() {
     textFund.text = "Maximum : ${bitCoinFormat.decimalToDoge(maxBalance).toPlainString()}"
     textProbability.text = "Possibility: ${(high + BigDecimal(5)) * BigDecimal(10)}%"
 
+    walletDeposit = user.getString("walletDeposit")
+    walletWithdraw = user.getString("walletWithdraw")
+
     setDefaultView()
 
     buttonDespot.setOnClickListener {
-      CustomDialog.deposit(this, user.getString("walletDeposit"))
+      CustomDialog.deposit(this, walletDeposit)
     }
 
     buttonLogout.setOnClickListener {
       loading.openDialog()
       user.clear()
       doge.clear()
-      Timer().schedule(100) {
+      Timer().schedule(1000) {
+        WebController.Get("user.logout", user.getString("token")).call()
         move = Intent(applicationContext, MainActivity::class.java)
         runOnUiThread {
-          loading.closeDialog()
           startActivity(move)
+          loading.closeDialog()
           finishAffinity()
         }
       }
@@ -241,6 +256,61 @@ class HomeActivity : AppCompatActivity() {
       linearLayout.addView(valueView, 1)
     } else {
       linearLayout.addView(valueView)
+    }
+  }
+
+  override fun onStart() {
+    super.onStart()
+    webApiIntent = Intent(applicationContext, ServiceGetUser::class.java)
+    startService(webApiIntent)
+
+    LocalBroadcastManager.getInstance(applicationContext).registerReceiver(getUserService, IntentFilter("web.api"))
+
+    dogeApiIntent = Intent(applicationContext, ServiceGetBalance::class.java)
+    startService(dogeApiIntent)
+
+    LocalBroadcastManager.getInstance(applicationContext).registerReceiver(getBalanceService, IntentFilter("doge.api"))
+  }
+
+  override fun onBackPressed() {
+    super.onBackPressed()
+    LocalBroadcastManager.getInstance(this).unregisterReceiver(getUserService)
+    stopService(webApiIntent)
+    LocalBroadcastManager.getInstance(this).unregisterReceiver(getBalanceService)
+    stopService(dogeApiIntent)
+  }
+
+  override fun onStop() {
+    super.onStop()
+    stopService(webApiIntent)
+    stopService(dogeApiIntent)
+  }
+
+  private var getUserService: BroadcastReceiver = object : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {
+      if (intent.getBooleanExtra("isLogout", false)) {
+        loading.openDialog()
+        user.clear()
+        doge.clear()
+        Timer().schedule(1000) {
+          WebController.Get("user.logout", user.getString("token")).call()
+          move = Intent(applicationContext, MainActivity::class.java)
+          runOnUiThread {
+            startActivity(move)
+            loading.closeDialog()
+            finishAffinity()
+          }
+        }
+      } else {
+        walletDeposit = intent.getStringExtra("walletDeposit").toString()
+        walletWithdraw = intent.getStringExtra("walletWithdraw").toString()
+      }
+    }
+  }
+  private var getBalanceService: BroadcastReceiver = object : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {
+      balance = intent.getSerializableExtra("balance") as BigDecimal
+      textBalance.text = bitCoinFormat.decimalToDoge(balance).toPlainString()
     }
   }
 }

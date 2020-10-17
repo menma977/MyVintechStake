@@ -13,14 +13,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.myvintech.stake.config.Loading
 import com.myvintech.stake.config.Popup
-import com.myvintech.stake.controller.DogeController
+import com.myvintech.stake.controller.WebController
 import com.myvintech.stake.model.Doge
 import com.myvintech.stake.model.User
 import com.myvintech.stake.view.HomeActivity
 import org.json.JSONObject
 import java.math.BigDecimal
 import java.util.*
-import java.util.concurrent.Executors
 import kotlin.collections.HashMap
 import kotlin.concurrent.schedule
 
@@ -35,7 +34,6 @@ class LoginActivity : AppCompatActivity() {
   private lateinit var passwordInput: EditText
   private lateinit var loginButton: Button
   private lateinit var json: JSONObject
-  private val executor = Executors.newFixedThreadPool(10)
   private var body = HashMap<String, String>()
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,8 +52,8 @@ class LoginActivity : AppCompatActivity() {
     passwordInput = findViewById(R.id.editTextPassword)
     loginButton = findViewById(R.id.buttonLogin)
 
-    usernameInput.setText("076oa4248d45")
-    passwordInput.setText("722g704d7859")
+    usernameInput.setText("menma977")
+    passwordInput.setText("admin")
 
     loginButton.setOnClickListener {
       loading.openDialog()
@@ -75,7 +73,7 @@ class LoginActivity : AppCompatActivity() {
           passwordInput.requestFocus()
         }
         else -> {
-          onLoginDoge(usernameInput.text.toString(), passwordInput.text.toString())
+          onLogin(usernameInput.text.toString(), passwordInput.text.toString())
         }
       }
     }
@@ -83,25 +81,24 @@ class LoginActivity : AppCompatActivity() {
     loading.closeDialog()
   }
 
-  private fun onLoginDoge(username: String, password: String) {
-    body["a"] = "Login"
-    body["key"] = doge.tokenDoge()
+  private fun onLogin(username: String, password: String) {
     body["username"] = username
     body["password"] = password
-    body["Totp"] = "''"
     Timer().schedule(500) {
-      json = executor.submit(DogeController(body)).get()
+      json = WebController.Post("login", "", body).call()
       if (json.getInt("code") == 200) {
         runOnUiThread {
-          user.setString("session", json.getJSONObject("data").getString("SessionCookie"))
-          user.setString("walletDeposit", json.getJSONObject("data").getJSONObject("Doge").getString("DepositAddress"))
+          user.setString("token", json.getJSONObject("data").getString("token"))
+          user.setString("session", json.getJSONObject("data").getString("session"))
+          user.setString("walletDeposit", json.getJSONObject("data").getString("walletDeposit"))
+          user.setString("walletWithdraw", json.getJSONObject("data").getString("walletWithdraw"))
           doge.setString("username", username)
           doge.setString("password", password)
           loading.closeDialog()
           move = Intent(applicationContext, HomeActivity::class.java)
-          move.putExtra("balance", BigDecimal(json.getJSONObject("data").getJSONObject("Doge").getString("Balance")))
-          finishAffinity()
+          move.putExtra("balance", BigDecimal(json.getJSONObject("data").getString("balance")))
           startActivity(move)
+          finishAffinity()
         }
       } else {
         runOnUiThread {
