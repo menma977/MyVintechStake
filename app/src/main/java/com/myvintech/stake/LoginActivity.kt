@@ -104,7 +104,7 @@ class LoginActivity : AppCompatActivity() {
     body.addEncoded("username", username)
     body.addEncoded("password", password)
     Timer().schedule(500) {
-      json = WebController.Post("login", "", body).call()
+      json = WebController.Post("login.android", "", body).call()
       println(json)
       if (json.getInt("code") == 200) {
         runOnUiThread {
