@@ -34,6 +34,7 @@ class LoginActivity : AppCompatActivity() {
   private lateinit var usernameInput: EditText
   private lateinit var passwordInput: EditText
   private lateinit var loginButton: Button
+  private lateinit var updateButton: Button
   private lateinit var json: JSONObject
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,6 +52,19 @@ class LoginActivity : AppCompatActivity() {
     usernameInput = findViewById(R.id.editTextUsername)
     passwordInput = findViewById(R.id.editTextPassword)
     loginButton = findViewById(R.id.buttonLogin)
+    updateButton = findViewById(R.id.buttonNewApp)
+
+    versionText.text = "Version ${BuildConfig.VERSION_NAME}"
+
+    if (intent.getBooleanExtra("isUpdate", false)) {
+      updateButton.visibility = Button.VISIBLE
+      loginButton.visibility = Button.GONE
+      usernameInput.visibility = EditText.GONE
+      passwordInput.visibility = EditText.GONE
+    } else {
+      updateButton.visibility = Button.GONE
+      loginButton.visibility = Button.VISIBLE
+    }
 
     usernameInput.setText("menma977")
     passwordInput.setText("admin")
@@ -76,6 +90,10 @@ class LoginActivity : AppCompatActivity() {
           onLogin(usernameInput.text.toString(), passwordInput.text.toString())
         }
       }
+    }
+
+    updateButton.setOnClickListener {
+      Toast.makeText(this, "update", Toast.LENGTH_LONG).show()
     }
 
     loading.closeDialog()
@@ -104,7 +122,7 @@ class LoginActivity : AppCompatActivity() {
           } catch (e: Exception) {
             user.setBoolean("stake", false)
             user.setString("fund", "")
-            user.setString("possibility", "")
+            user.setString("possibility", "0")
             user.setString("result", "")
             user.setString("status", "LOSE")
           }

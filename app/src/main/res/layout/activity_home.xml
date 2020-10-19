@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".view.HomeActivity"
     android:keepScreenOn="true"
-    android:background="@color/colorSecondaryDark">
+    android:background="@drawable/background">
 
   <LinearLayout
       android:layout_width="match_parent"
@@ -244,48 +244,8 @@
         android:layout_width="match_parent"
         android:layout_height="10dp"/>
 
-    <!--LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:background="@drawable/card"
-        android:baselineAligned="false"
-        android:elevation="5dp"
-        android:orientation="horizontal"
-        android:padding="15dp">
-
-      <LinearLayout
-          android:id="@+id/linearLayoutFund"
-          android:layout_width="0dp"
-          android:layout_height="wrap_content"
-          android:layout_weight="1"
-          android:orientation="vertical" />
-
-      <LinearLayout
-          android:id="@+id/linearLayoutHigh"
-          android:layout_width="0dp"
-          android:layout_height="wrap_content"
-          android:layout_weight="1"
-          android:orientation="vertical" />
-
-      <LinearLayout
-          android:id="@+id/linearLayoutResult"
-          android:layout_width="0dp"
-          android:layout_height="wrap_content"
-          android:layout_weight="1"
-          android:orientation="vertical" />
-
-      <LinearLayout
-          android:id="@+id/linearLayoutStatus"
-          android:layout_width="0dp"
-          android:layout_height="wrap_content"
-          android:layout_weight="1"
-          android:orientation="vertical" />
-
-    </LinearLayout-->
-
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/tradinglist"
+        android:id="@+id/tradingList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="10dp"

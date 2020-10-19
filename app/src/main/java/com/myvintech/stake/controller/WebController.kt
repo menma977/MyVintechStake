@@ -67,9 +67,15 @@ class WebController {
         val input = BufferedReader(InputStreamReader(response.body!!.byteStream()))
         val inputData: String = input.readLine()
         val convertJSON = JSONObject(inputData)
-
         if (response.isSuccessful) {
-          JSONObject().put("code", 200).put("data", convertJSON)
+          when {
+            convertJSON.toString().contains("message") -> {
+              JSONObject().put("code", 200).put("data", convertJSON.getString("message"))
+            }
+            else -> {
+              JSONObject().put("code", 200).put("data", convertJSON)
+            }
+          }
         } else {
           when {
             convertJSON.toString().contains("errors") -> {

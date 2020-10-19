@@ -17,4 +17,7 @@
   <string name="barcode">barcode</string>
   <string name="withdraw_all">Withdraw All</string>
   <string name="logout">Logout</string>
+  <string name="high">High</string>
+  <string name="result">Result</string>
+  <string name="download_new_app">Download New App</string>
 </resources>

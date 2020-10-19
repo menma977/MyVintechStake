@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
-import android.util.Log
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -29,6 +28,7 @@ import com.myvintech.stake.view.adapter.TradingListAdapter
 import com.myvintech.stake.view.modal.CustomDialog
 import okhttp3.FormBody
 import org.json.JSONObject
+import java.lang.Exception
 import java.math.BigDecimal
 import java.util.*
 import kotlin.collections.ArrayList
@@ -55,6 +55,7 @@ class HomeActivity : AppCompatActivity() {
   private lateinit var bitCoinFormat: BitCoinFormat
   private lateinit var percentTable: ArrayList<Double>
   private lateinit var json: JSONObject
+
   /*
   private lateinit var fundLinearLayout: LinearLayout
   private lateinit var highLinearLayout: LinearLayout
@@ -64,7 +65,6 @@ class HomeActivity : AppCompatActivity() {
   private lateinit var tradingList: RecyclerView
   private lateinit var listTradingAdapter: TradingListAdapter
   private lateinit var viewManager: RecyclerView.LayoutManager
-
   private lateinit var webApiIntent: Intent
   private lateinit var dogeApiIntent: Intent
   private lateinit var walletDeposit: String
@@ -75,9 +75,7 @@ class HomeActivity : AppCompatActivity() {
   private var payInMultiple: BigDecimal = BigDecimal(1)
   private var high = BigDecimal(0)
   private var seed = (0..99999).random().toString()
-  private var maxRow = 10
   private var isWin = false
-
   private val myDataset = ArrayList<TradingResult>()
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -104,34 +102,39 @@ class HomeActivity : AppCompatActivity() {
     buttonWithdrawAll = findViewById(R.id.buttonWithdrawAll)
     buttonLogout = findViewById(R.id.buttonLogout)
     editTextAmount = findViewById(R.id.editTextAmount)
-    /*
-    fundLinearLayout = findViewById(R.id.linearLayoutFund)
-    highLinearLayout = findViewById(R.id.linearLayoutHigh)
-    resultLinearLayout = findViewById(R.id.linearLayoutResult)
-    statusLinearLayout = findViewById(R.id.linearLayoutStatus)
-     */
     viewManager = LinearLayoutManager(this)
     listTradingAdapter = TradingListAdapter(applicationContext, myDataset)
-    tradingList = findViewById<RecyclerView>(R.id.tradinglist).apply {
+    tradingList = findViewById<RecyclerView>(R.id.tradingList).apply {
       layoutManager = viewManager
       adapter = listTradingAdapter
-    }
-    Log.d("LOL2","AAAA")
-
-    for (i in 1..20)
-      listTradingAdapter.addItem(TradingResult(BigDecimal.valueOf(i+0.1),3, BigDecimal.ZERO,i%2==0))
-
-    // setDefaultView()
-
-    if (user.getBoolean("isStake")) {
-      buttonStake.visibility = Button.GONE
-      buttonStop.visibility = Button.GONE
-    } else if (user.getString("status") == "WIN") {
-      buttonStake.visibility = Button.GONE
     }
 
     buttonDespot.setOnClickListener {
       CustomDialog.deposit(this, walletDeposit)
+    }
+
+    buttonWithdrawAll.setOnClickListener {
+      loading.openDialog()
+      val body = FormBody.Builder()
+      body.addEncoded("a", "Withdraw")
+      body.addEncoded("s", user.getString("session"))
+      body.addEncoded("Amount", "0")
+      body.addEncoded("Address", user.getString("walletWithdraw"))
+      body.addEncoded("Currency", "doge")
+      Timer().schedule(100) {
+        json = DogeController(body).call()
+        if (json.getInt("code") == 200) {
+          runOnUiThread {
+            Popup(applicationContext).show("withdrawal in queue", Toast.LENGTH_LONG)
+            loading.closeDialog()
+          }
+        } else {
+          runOnUiThread {
+            Popup(applicationContext).show(json.getString("data"), Toast.LENGTH_LONG)
+            loading.closeDialog()
+          }
+        }
+      }
     }
 
     buttonLogout.setOnClickListener {
@@ -162,6 +165,27 @@ class HomeActivity : AppCompatActivity() {
       override fun onStopTrackingTouch(seekBar: SeekBar) {}
     })
 
+    buttonStop.setOnClickListener {
+      loading.openDialog()
+      Timer().schedule(1000) {
+        json = WebController.Get("stake.stop", user.getString("token")).call()
+        if (json.getInt("code") == 200) {
+          runOnUiThread {
+            Popup(applicationContext).show(json.getString("data"), Toast.LENGTH_LONG)
+            move = Intent(applicationContext, MainActivity::class.java)
+            loading.closeDialog()
+            startActivity(move)
+            finishAffinity()
+          }
+        } else {
+          runOnUiThread {
+            Popup(applicationContext).show(json.getString("data"), Toast.LENGTH_LONG)
+            loading.closeDialog()
+          }
+        }
+      }
+    }
+
     buttonStake.setOnClickListener {
       when {
         editTextAmount.text.isEmpty() -> {
@@ -180,17 +204,19 @@ class HomeActivity : AppCompatActivity() {
     walletDeposit = user.getString("walletDeposit")
     walletWithdraw = user.getString("walletWithdraw")
 
+    getDataUser()
+
     balance = intent.getSerializableExtra("balance") as BigDecimal
     if (user.getBoolean("stake")) {
       payIn = user.getString("fund").toBigDecimal()
       high = user.getString("possibility").toBigDecimal()
-      seekBar.progress = user.getString("possibility").toInt()
-      maxBalance = bitCoinFormat.dogeToDecimal(bitCoinFormat.decimalToDoge(payIn).multiply(BigDecimal(0.01))).multiply(percentTable[high.toInt() + 1].toBigDecimal())
+      seekBar.progress = user.getString("possibility").toInt() + 1
+      maxBalance = bitCoinFormat.dogeToDecimal(bitCoinFormat.decimalToDoge(payIn)).multiply(percentTable[high.toInt()].toBigDecimal())
       if (user.getString("status").contains("WIN")) {
         isWin = true
       }
     } else {
-      maxBalance = bitCoinFormat.dogeToDecimal(bitCoinFormat.decimalToDoge(balance).multiply(BigDecimal(0.01))).multiply(percentTable[high.toInt() + 1].toBigDecimal())
+      maxBalance = bitCoinFormat.dogeToDecimal(bitCoinFormat.decimalToDoge(balance).multiply(BigDecimal(0.01))).multiply(percentTable[high.toInt()].toBigDecimal())
       payIn = balance.multiply(BigDecimal(0.01))
     }
 
@@ -198,8 +224,6 @@ class HomeActivity : AppCompatActivity() {
     textBalance.text = BitCoinFormat.decimalToDoge(balance).toPlainString()
     textFund.text = "Maximum : ${bitCoinFormat.decimalToDoge(maxBalance).toPlainString()}"
     textProbability.text = "Possibility: ${(high + BigDecimal(5)) * BigDecimal(10)}%"
-
-    loading.closeDialog()
   }
 
   private fun onBot() {
@@ -232,28 +256,21 @@ class HomeActivity : AppCompatActivity() {
           body.addEncoded("possibility", seekBar.progress.toString())
           body.addEncoded("result", puyOut.toPlainString())
 
-          /*
-          setView(bitCoinFormat.decimalToDoge(payIn).toPlainString(), fundLinearLayout, false, winBot)
-          setView("${(seekBar.progress + 1) * 10}%", highLinearLayout, false, winBot)
-          setView(bitCoinFormat.decimalToDoge(puyOut).toPlainString(), resultLinearLayout, false, winBot)
-           */
-
-          listTradingAdapter.addItem(TradingResult(bitCoinFormat.decimalToDoge(payIn),
-            (seekBar.progress + 1) * 10,
-            bitCoinFormat.decimalToDoge(puyOut),
-            winBot));
+          listTradingAdapter.addItem(
+            TradingResult(
+              bitCoinFormat.decimalToDoge(payIn), (seekBar.progress + 1) * 10, bitCoinFormat.decimalToDoge(puyOut), winBot
+            )
+          )
 
           if (winBot) {
-            //setView("WIN", statusLinearLayout, false, winBot)
             buttonStake.visibility = Button.GONE
             textStatus.text = "WIN"
-            textStatus.setTextColor(ContextCompat.getColor(applicationContext,R.color.Success))
+            textStatus.setTextColor(ContextCompat.getColor(applicationContext, R.color.Success))
             body.addEncoded("stop", "true")
             body.addEncoded("status", "WIN")
           } else {
-            //setView("LOSE", statusLinearLayout, false, winBot)
             textStatus.text = "LOSE"
-            textStatus.setTextColor(ContextCompat.getColor(applicationContext,R.color.Danger))
+            textStatus.setTextColor(ContextCompat.getColor(applicationContext, R.color.Danger))
 
             payInMultiple = BigDecimal(2)
 
@@ -282,21 +299,60 @@ class HomeActivity : AppCompatActivity() {
     }
   }
 
-  /*
-  private fun setDefaultView() {
-    setView("Fund", fundLinearLayout, isNew = true, isWin = false)
-    setView("Possibility", highLinearLayout, isNew = true, isWin = false)
-    setView("Result", resultLinearLayout, isNew = true, isWin = false)
-    setView("Status", statusLinearLayout, isNew = true, isWin = false)
+  private fun getDataUser() {
+    Timer().schedule(1000) {
+      json = WebController.Get("user.index", user.getString("token")).call()
+      if (json.getInt("code") == 200) {
+        user.setBoolean("isStake", json.getJSONObject("data").getBoolean("isStake"))
+        if (json.getJSONObject("data").getBoolean("isStake")) {
+          runOnUiThread {
+            buttonStake.visibility = Button.GONE
+            buttonStop.visibility = Button.GONE
+          }
+        }
+        try {
+          user.setBoolean("stake", true)
+          user.setString("fund", json.getJSONObject("data").getJSONObject("lastStake").getString("fund"))
+          user.setString("possibility", json.getJSONObject("data").getJSONObject("lastStake").getString("possibility"))
+          user.setString("result", json.getJSONObject("data").getJSONObject("lastStake").getString("result"))
+          user.setString("status", json.getJSONObject("data").getJSONObject("lastStake").getString("status"))
+        } catch (e: Exception) {
+          user.setBoolean("stake", false)
+          user.setString("fund", "")
+          user.setString("possibility", "")
+          user.setString("result", "")
+          user.setString("status", "LOSE")
+        }
 
-    for (i in 0 until maxRow) {
-      setView("", fundLinearLayout, isNew = true, isWin = false)
-      setView("", highLinearLayout, isNew = true, isWin = false)
-      setView("", resultLinearLayout, isNew = true, isWin = false)
-      setView("", statusLinearLayout, isNew = true, isWin = false)
+        getListView()
+      } else {
+        runOnUiThread {
+          Popup(applicationContext).show("table not read correctly. please close the application and reopen it", Toast.LENGTH_LONG)
+        }
+      }
     }
   }
-  */
+
+  private fun getListView() {
+    Timer().schedule(100) {
+      json = WebController.Get("stake.index", user.getString("token")).call()
+      println(json)
+      runOnUiThread {
+        if (!json.getJSONObject("data").isNull("lastStake")) {
+          for (i in 0 until json.getJSONObject("data").getJSONArray("listStake").length()) {
+            json.getJSONObject("data").getJSONArray("listStake").length()
+            val data = json.getJSONObject("data").getJSONArray("listStake").getJSONObject(i)
+            val fund = bitCoinFormat.decimalToDoge(data.getString("fund").toBigDecimal())
+            val possibility = (data.getInt("possibility") + 5) * 10
+            val result = bitCoinFormat.decimalToDoge(data.getString("result").toBigDecimal())
+            val status = data.getString("status") == "WIN"
+            listTradingAdapter.addItem(TradingResult(fund, possibility, result, status))
+          }
+        }
+        loading.closeDialog()
+      }
+    }
+  }
 
   private fun setListTargetMaximum() {
     percentTable.add(1.0)
@@ -305,34 +361,6 @@ class HomeActivity : AppCompatActivity() {
     percentTable.add(4.1)
     percentTable.add(9.0)
   }
-
-  /*
-  private fun setView(value: String, linearLayout: LinearLayout, isNew: Boolean, isWin: Boolean) {
-    val template = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-    val valueView = TextView(applicationContext)
-    valueView.text = value
-    valueView.gravity = Gravity.CENTER
-    valueView.layoutParams = template
-    if (isNew) {
-      valueView.setTextColor(ContextCompat.getColor(applicationContext,R.color.colorAccent))
-    } else {
-      if (isWin) {
-        valueView.setTextColor(ContextCompat.getColor(applicationContext,R.color.Success))
-        buttonStake.visibility = Button.GONE
-        user.setBoolean("isWin", true)
-      } else {
-        valueView.setTextColor(ContextCompat.getColor(applicationContext,R.color.Danger))
-      }
-    }
-
-    if ((linearLayout.childCount - 1) == maxRow) {
-      linearLayout.removeViewAt(linearLayout.childCount - 1)
-      linearLayout.addView(valueView, 1)
-    } else {
-      linearLayout.addView(valueView)
-    }
-  }
-   */
 
   override fun onStart() {
     super.onStart()
@@ -379,15 +407,11 @@ class HomeActivity : AppCompatActivity() {
         walletWithdraw = intent.getStringExtra("walletWithdraw").toString()
 
         if (intent.getBooleanExtra("stake", false)) {
-          payIn = intent.getSerializableExtra("fund") as BigDecimal
-          high = intent.getSerializableExtra("possibility") as BigDecimal
-          seekBar.progress = BigDecimal(intent.getSerializableExtra("possibility").toString()).toInt()
-          maxBalance = bitCoinFormat.dogeToDecimal(bitCoinFormat.decimalToDoge(payIn).multiply(BigDecimal(0.01))).multiply(percentTable[high.toInt() + 1].toBigDecimal())
           if (user.getString("status").contains("WIN")) {
             isWin = true
           }
         } else {
-          maxBalance = bitCoinFormat.dogeToDecimal(bitCoinFormat.decimalToDoge(balance).multiply(BigDecimal(0.01))).multiply(percentTable[high.toInt() + 1].toBigDecimal())
+          maxBalance = bitCoinFormat.dogeToDecimal(bitCoinFormat.decimalToDoge(balance).multiply(BigDecimal(0.01))).multiply(percentTable[high.toInt()].toBigDecimal())
           payIn = balance.multiply(BigDecimal(0.01))
         }
 
@@ -398,11 +422,17 @@ class HomeActivity : AppCompatActivity() {
         val viewProbability = "Possibility: ${(high + BigDecimal(5)) * BigDecimal(10)}%"
         textProbability.text = viewProbability
 
-        if (user.getBoolean("isStake")) {
+        if (user.getBoolean("isStake") && user.getString("status") == "WIN") {
           buttonStake.visibility = Button.GONE
           buttonStop.visibility = Button.GONE
         } else if (user.getString("status") == "WIN") {
           buttonStake.visibility = Button.GONE
+        } else if (user.getBoolean("isStake")) {
+          buttonStake.visibility = Button.GONE
+          buttonStop.visibility = Button.GONE
+        } else {
+          buttonStake.visibility = Button.VISIBLE
+          buttonStop.visibility = Button.VISIBLE
         }
       }
     }

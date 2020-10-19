@@ -4,6 +4,7 @@ import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.myvintech.stake.BuildConfig
 import com.myvintech.stake.controller.WebController
 import com.myvintech.stake.model.User
 import org.json.JSONObject
@@ -54,14 +55,17 @@ class ServiceGetUser : Service() {
                   privateIntent.putExtra("result", json.getJSONObject("data").getJSONObject("lastStake").getString("status"))
 
                   user.setString("status", json.getJSONObject("data").getJSONObject("lastStake").getString("status"))
-                }catch (e: Exception) {
+                } catch (e: Exception) {
                   privateIntent.putExtra("stake", false)
                   privateIntent.putExtra("fund", "")
-                  privateIntent.putExtra("possibility", "")
+                  privateIntent.putExtra("possibility", "0")
                   privateIntent.putExtra("result", "")
                   privateIntent.putExtra("status", "LOSE")
 
                   user.setString("status", "LOSE")
+                }
+                if (json.getJSONObject("data").getInt("version") != BuildConfig.VERSION_CODE) {
+                  privateIntent.putExtra("isLogout", true)
                 }
 
                 user.setBoolean("isStake", json.getJSONObject("data").getBoolean("isStake"))
