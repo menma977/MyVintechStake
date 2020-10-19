@@ -15,7 +15,7 @@ import com.myvintech.stake.model.TradingResult
 import java.math.BigDecimal
 
 class TradingListAdapter(private val context: Context, private val myDataset: ArrayList<TradingResult>) : RecyclerView.Adapter<TradingListAdapter.MyViewHolder>() {
-  private var max: Int = 20
+  private var max: Int = 21
 
   init {
     myDataset.add(0, TradingResult(BigDecimal.ZERO, 0, BigDecimal.ZERO, false))
@@ -42,11 +42,11 @@ class TradingListAdapter(private val context: Context, private val myDataset: Ar
   }
 
   fun setMax(max: Int) {
-    this.max = max
+    this.max = max+1
   }
 
   fun getMax(): Int {
-    return max
+    return max-1
   }
 
   override fun getItemViewType(position: Int): Int {
@@ -70,6 +70,8 @@ class TradingListAdapter(private val context: Context, private val myDataset: Ar
   override fun getItemCount() = myDataset.size
 
   fun addItem(item: TradingResult) {
+    if(myDataset.size == max)
+      myDataset.removeAt(myDataset.size-1)
     myDataset.add(1, item)
     this.notifyDataSetChanged()
     this.notifyItemRangeInserted(0, myDataset.size)

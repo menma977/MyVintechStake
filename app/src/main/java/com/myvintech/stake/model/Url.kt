@@ -2,7 +2,7 @@ package com.myvintech.stake.model
 
 object Url {
   fun web(): String {
-    return "http://192.168.67.224/api/"
+    return "https://wallet.myvintech.com/api/"
   }
 
   fun doge(): String {
