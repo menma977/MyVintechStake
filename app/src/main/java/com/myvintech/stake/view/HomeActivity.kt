@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -113,6 +114,8 @@ class HomeActivity : AppCompatActivity() {
       CustomDialog.deposit(this, walletDeposit)
     }
 
+    buttonWithdrawAll.visibility = Button.GONE
+
     buttonWithdrawAll.setOnClickListener {
       loading.openDialog()
       val body = FormBody.Builder()
@@ -166,27 +169,39 @@ class HomeActivity : AppCompatActivity() {
     })
 
     buttonStop.setOnClickListener {
-      loading.openDialog()
-      Timer().schedule(1000) {
-        val body = FormBody.Builder()
-        body.addEncoded("sessionDoge", user.getString("session"))
-        body.addEncoded("walletWithdraw", user.getString("walletWithdraw"))
-        json = WebController.Post("stake.stop", user.getString("token"), body).call()
-        if (json.getInt("code") == 200) {
-          runOnUiThread {
-            Popup(applicationContext).show(json.getString("data"), Toast.LENGTH_LONG)
-            move = Intent(applicationContext, MainActivity::class.java)
-            loading.closeDialog()
-            startActivity(move)
-            finishAffinity()
-          }
-        } else {
-          runOnUiThread {
-            Popup(applicationContext).show(json.getString("data"), Toast.LENGTH_LONG)
-            loading.closeDialog()
+      val builder = AlertDialog.Builder(this)
+      builder.setTitle("confirmation")
+      builder.setMessage("You are sure ?")
+      builder.setCancelable(true)
+      builder.setPositiveButton("Yes") { dialogInterface, _ ->
+        loading.openDialog()
+        Timer().schedule(1000) {
+          val body = FormBody.Builder()
+          body.addEncoded("sessionDoge", user.getString("session"))
+          body.addEncoded("walletWithdraw", user.getString("walletWithdraw"))
+          json = WebController.Post("stake.stop", user.getString("token"), body).call()
+          if (json.getInt("code") == 200) {
+            runOnUiThread {
+              dialogInterface.dismiss()
+              Popup(applicationContext).show(json.getString("data"), Toast.LENGTH_LONG)
+              move = Intent(applicationContext, MainActivity::class.java)
+              loading.closeDialog()
+              startActivity(move)
+              finishAffinity()
+            }
+          } else {
+            runOnUiThread {
+              Popup(applicationContext).show(json.getString("data"), Toast.LENGTH_LONG)
+              loading.closeDialog()
+              dialogInterface.dismiss()
+            }
           }
         }
       }
+      builder.setNegativeButton("Cancel") { dialogInterface, _ ->
+        dialogInterface.dismiss()
+      }
+      builder.create().show()
     }
 
     buttonStake.setOnClickListener {
@@ -236,7 +251,7 @@ class HomeActivity : AppCompatActivity() {
       body.addEncoded("a", "PlaceBet")
       body.addEncoded("s", user.getString("session"))
       body.addEncoded("Low", "0")
-      body.addEncoded("High", ((high + BigDecimal(1)).multiply(BigDecimal(10)).multiply(BigDecimal(10000)) - BigDecimal(600)).toPlainString())
+      body.addEncoded("High", ((high + BigDecimal(5)).multiply(BigDecimal(10)).multiply(BigDecimal(10000)) - BigDecimal(600)).toPlainString())
       body.addEncoded("PayIn", payIn.toPlainString())
       body.addEncoded("ProtocolVersion", "2")
       body.addEncoded("ClientSeed", seed)
