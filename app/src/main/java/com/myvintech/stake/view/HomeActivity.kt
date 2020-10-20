@@ -56,13 +56,6 @@ class HomeActivity : AppCompatActivity() {
   private lateinit var bitCoinFormat: BitCoinFormat
   private lateinit var percentTable: ArrayList<Double>
   private lateinit var json: JSONObject
-
-  /*
-  private lateinit var fundLinearLayout: LinearLayout
-  private lateinit var highLinearLayout: LinearLayout
-  private lateinit var resultLinearLayout: LinearLayout
-  private lateinit var statusLinearLayout: LinearLayout
-   */
   private lateinit var tradingList: RecyclerView
   private lateinit var listTradingAdapter: TradingListAdapter
   private lateinit var viewManager: RecyclerView.LayoutManager
