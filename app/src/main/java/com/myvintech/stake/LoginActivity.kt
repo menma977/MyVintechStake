@@ -1,6 +1,7 @@
 package com.myvintech.stake
 
 import android.Manifest
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
@@ -9,6 +10,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.myvintech.stake.config.Loading
@@ -19,7 +21,6 @@ import com.myvintech.stake.model.User
 import com.myvintech.stake.view.HomeActivity
 import okhttp3.FormBody
 import org.json.JSONObject
-import java.lang.Exception
 import java.math.BigDecimal
 import java.util.*
 import kotlin.concurrent.schedule
