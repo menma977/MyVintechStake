@@ -66,9 +66,6 @@ class LoginActivity : AppCompatActivity() {
       loginButton.visibility = Button.VISIBLE
     }
 
-    usernameInput.setText("menma977")
-    passwordInput.setText("admin")
-
     loginButton.setOnClickListener {
       loading.openDialog()
       when {
