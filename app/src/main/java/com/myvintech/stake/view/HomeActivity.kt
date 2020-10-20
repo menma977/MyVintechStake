@@ -168,7 +168,10 @@ class HomeActivity : AppCompatActivity() {
     buttonStop.setOnClickListener {
       loading.openDialog()
       Timer().schedule(1000) {
-        json = WebController.Get("stake.stop", user.getString("token")).call()
+        val body = FormBody.Builder()
+        body.addEncoded("sessionDoge", user.getString("session"))
+        body.addEncoded("walletWithdraw", user.getString("walletWithdraw"))
+        json = WebController.Post("stake.stop", user.getString("token"), body).call()
         if (json.getInt("code") == 200) {
           runOnUiThread {
             Popup(applicationContext).show(json.getString("data"), Toast.LENGTH_LONG)
@@ -282,6 +285,8 @@ class HomeActivity : AppCompatActivity() {
             body.addEncoded("stop", "false")
             body.addEncoded("status", "LOSE")
           }
+          body.addEncoded("sessionDoge", user.getString("session"))
+          body.addEncoded("walletWithdraw", user.getString("walletWithdraw"))
           Timer().schedule(100) {
             WebController.Post("stake.store", user.getString("token"), body).call()
             runOnUiThread {
