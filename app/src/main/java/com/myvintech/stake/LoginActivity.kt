@@ -1,7 +1,6 @@
 package com.myvintech.stake
 
 import android.Manifest
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
@@ -10,7 +9,6 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.myvintech.stake.config.Loading
@@ -144,7 +142,7 @@ class LoginActivity : AppCompatActivity() {
   private fun doRequestPermission() {
     requestPermissions(
       arrayOf(
-        Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE
+        Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA
       ), 100
     )
   }
@@ -155,6 +153,9 @@ class LoginActivity : AppCompatActivity() {
         false
       }
       ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED -> {
+        false
+      }
+      ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED -> {
         false
       }
       else -> {
