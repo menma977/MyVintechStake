@@ -3,6 +3,7 @@ package com.myvintech.stake
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.widget.Button
@@ -89,7 +90,10 @@ class LoginActivity : AppCompatActivity() {
     }
 
     updateButton.setOnClickListener {
-      Toast.makeText(this, "update", Toast.LENGTH_LONG).show()
+      user.clear()
+      doge.clear()
+      move = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.myvintech.com/"))
+      startActivity(move)
     }
 
     loading.closeDialog()
