@@ -269,7 +269,7 @@ class HomeActivity : AppCompatActivity() {
 
           listTradingAdapter.addItem(
             TradingResult(
-              bitCoinFormat.decimalToDoge(payIn), (seekBar.progress + 1) * 10, bitCoinFormat.decimalToDoge(puyOut), winBot
+              bitCoinFormat.decimalToDoge(payIn), (seekBar.progress + 5) * 10, bitCoinFormat.decimalToDoge(puyOut), winBot
             )
           )
 
