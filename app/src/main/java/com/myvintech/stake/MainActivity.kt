@@ -28,7 +28,6 @@ class MainActivity : AppCompatActivity() {
     val cookie = user.getString("session")
     Timer().schedule(500) {
       json = WebController.Get("version", "").call()
-      println(json)
       if (json.getInt("code") == 200) {
         if (json.getJSONObject("data").getInt("version") == BuildConfig.VERSION_CODE) {
           when {
