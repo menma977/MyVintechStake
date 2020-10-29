@@ -37,7 +37,7 @@ class ServiceGetUser : Service() {
       synchronized(trigger) {
         while (true) {
           val delta = System.currentTimeMillis() - time
-          if (delta >= 5000) {
+          if (delta >= 2000) {
             time = System.currentTimeMillis()
             val privateIntent = Intent()
             if (startBackgroundService) {

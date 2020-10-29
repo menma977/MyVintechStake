@@ -155,6 +155,7 @@ class HomeActivity : AppCompatActivity() {
         maxBalance = bitCoinFormat.dogeToDecimal(bitCoinFormat.decimalToDoge(payIn.multiply(percent.toBigDecimal())).multiply(payInMultiple))
         textFund.text = "Maximum : ${bitCoinFormat.decimalToDoge(maxBalance).toPlainString()}"
         textProbability.text = "Possibility: ${(high.toInt() + 1) * 10}%"
+        editTextAmount.setText(bitCoinFormat.decimalToDoge(maxBalance).toPlainString())
       }
 
       override fun onStartTrackingTouch(seekBar: SeekBar) {}
@@ -235,6 +236,7 @@ class HomeActivity : AppCompatActivity() {
     textBalance.text = BitCoinFormat.decimalToDoge(balance).toPlainString()
     textFund.text = "Maximum : ${bitCoinFormat.decimalToDoge(maxBalance).toPlainString()}"
     textProbability.text = "Possibility: ${(high + BigDecimal(5)) * BigDecimal(10)}%"
+    editTextAmount.setText(bitCoinFormat.decimalToDoge(maxBalance).toPlainString())
   }
 
   private fun onBot() {
@@ -287,6 +289,7 @@ class HomeActivity : AppCompatActivity() {
 
             maxBalance = bitCoinFormat.dogeToDecimal(bitCoinFormat.decimalToDoge(payIn.multiply(percent.toBigDecimal())).multiply(payInMultiple))
             textFund.text = "Maximum : ${bitCoinFormat.decimalToDoge(maxBalance).toPlainString()}"
+            editTextAmount.setText(bitCoinFormat.decimalToDoge(maxBalance).toPlainString())
             editTextAmount.isEnabled = true
 
             seekBar.progress = seekBar.progress + 1
@@ -438,11 +441,8 @@ class HomeActivity : AppCompatActivity() {
         if (user.getBoolean("isStake") && user.getString("status") == "WIN") {
           buttonStake.visibility = Button.GONE
           buttonStop.visibility = Button.GONE
-        } else if (user.getString("status") == "WIN") {
+        } else if (user.getBoolean("isStake") && user.getString("status") == "LOSE") {
           buttonStake.visibility = Button.GONE
-        } else if (user.getBoolean("isStake")) {
-          buttonStake.visibility = Button.GONE
-          buttonStop.visibility = Button.GONE
         } else {
           buttonStake.visibility = Button.VISIBLE
           buttonStop.visibility = Button.VISIBLE
