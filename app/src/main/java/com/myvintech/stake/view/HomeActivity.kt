@@ -244,6 +244,8 @@ class HomeActivity : AppCompatActivity() {
         val winBot = profit > BigDecimal(0)
 
         runOnUiThread {
+          user.setString("fund", payIn.toPlainString())
+
           balance = balanceRemaining
           textBalance.text = bitCoinFormat.decimalToDoge(balance).toPlainString()
 
@@ -264,6 +266,9 @@ class HomeActivity : AppCompatActivity() {
             body.addEncoded("stop", "true")
             body.addEncoded("status", "WIN")
             user.setString("status", "WIN")
+            //            body.addEncoded("stop", "false")
+            //            body.addEncoded("status", "LOSE")
+            //            user.setString("status", "LOSE")
           } else {
             textStatus.text = "LOSE"
             textStatus.setTextColor(ContextCompat.getColor(applicationContext, R.color.Danger))
@@ -326,15 +331,14 @@ class HomeActivity : AppCompatActivity() {
           payIn = user.getString("fund").toBigDecimal()
           high = user.getString("possibility").toBigDecimal()
           seekBar.progress = user.getString("possibility").toInt() + 1
-          maxBalance = bitCoinFormat.dogeToDecimal(bitCoinFormat.decimalToDoge(payIn)).multiply(percentTable[high.toInt()].toBigDecimal())
           if (user.getString("status").contains("WIN")) {
             isWin = true
           }
           payInMultiple = BigDecimal(2)
           maxBalance = bitCoinFormat.dogeToDecimal(bitCoinFormat.decimalToDoge(payIn).multiply(payInMultiple)).multiply(percentTable[high.toInt()].toBigDecimal())
         } else {
-          maxBalance = bitCoinFormat.dogeToDecimal(bitCoinFormat.decimalToDoge(balance).multiply(payInMultiple)).multiply(percentTable[high.toInt()].toBigDecimal())
-          payIn = balance.multiply(payInMultiple)
+          maxBalance = bitCoinFormat.dogeToDecimal(bitCoinFormat.decimalToDoge(balance).multiply(BigDecimal(0.01))).multiply(percentTable[high.toInt()].toBigDecimal())
+          payIn = balance.multiply(BigDecimal(0.01))
         }
 
         runOnUiThread {
@@ -430,9 +434,9 @@ class HomeActivity : AppCompatActivity() {
             isWin = true
           }
           payInMultiple = BigDecimal(2)
-          maxBalance = bitCoinFormat.dogeToDecimal(bitCoinFormat.decimalToDoge(payIn).multiply(payInMultiple)).multiply(percentTable[high.toInt()].toBigDecimal())
+          maxBalance = bitCoinFormat.dogeToDecimal(bitCoinFormat.decimalToDoge(user.getString("fund").toBigDecimal()).multiply(payInMultiple)).multiply(percentTable[high.toInt()].toBigDecimal())
         } else {
-          maxBalance = bitCoinFormat.dogeToDecimal(bitCoinFormat.decimalToDoge(balance).multiply(payInMultiple)).multiply(percentTable[high.toInt()].toBigDecimal())
+          maxBalance = bitCoinFormat.dogeToDecimal(bitCoinFormat.decimalToDoge(balance).multiply(BigDecimal(0.01))).multiply(percentTable[high.toInt()].toBigDecimal())
         }
 
         textUsername.text = Security.decrypt(user.getString("username"))
