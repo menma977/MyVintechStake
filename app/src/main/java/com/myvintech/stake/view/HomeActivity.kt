@@ -209,6 +209,7 @@ class HomeActivity : AppCompatActivity() {
           Toast.makeText(this, "Doge you can input should not be more than ${bitCoinFormat.decimalToDoge(maxBalance).toPlainString()}", Toast.LENGTH_LONG).show()
         }
         else -> {
+          buttonStake.isEnabled = false
           payIn = bitCoinFormat.dogeToDecimal(editTextAmount.text.toString().toBigDecimal())
           onBot()
         }
@@ -288,6 +289,7 @@ class HomeActivity : AppCompatActivity() {
           Timer().schedule(100) {
             WebController.Post("stake.store", user.getString("token"), body).call()
             runOnUiThread {
+              buttonStake.isEnabled = true
               editTextAmount.setText("")
               loading.closeDialog()
             }
@@ -295,6 +297,7 @@ class HomeActivity : AppCompatActivity() {
         }
       } else {
         runOnUiThread {
+          buttonStake.isEnabled = true
           Popup(applicationContext).show(json.getString("data"), Toast.LENGTH_SHORT)
           loading.closeDialog()
         }
