@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
+import android.util.Log
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -201,15 +202,20 @@ class HomeActivity : AppCompatActivity() {
     }
 
     buttonStake.setOnClickListener {
+      loading.openDialog()
+      buttonStake.visibility = Button.GONE
       when {
         editTextAmount.text.isEmpty() -> {
           Popup(this).show("Amount required", Toast.LENGTH_SHORT)
+          buttonStake.visibility = Button.VISIBLE
+          loading.closeDialog()
         }
         bitCoinFormat.dogeToDecimal(editTextAmount.text.toString().toBigDecimal()) > maxBalance -> {
           Toast.makeText(this, "Doge you can input should not be more than ${bitCoinFormat.decimalToDoge(maxBalance).toPlainString()}", Toast.LENGTH_LONG).show()
+          buttonStake.visibility = Button.VISIBLE
+          loading.closeDialog()
         }
         else -> {
-          buttonStake.isEnabled = false
           payIn = bitCoinFormat.dogeToDecimal(editTextAmount.text.toString().toBigDecimal())
           onBot()
         }
@@ -224,8 +230,7 @@ class HomeActivity : AppCompatActivity() {
 
   private fun onBot() {
     val body = FormBody.Builder()
-    loading.openDialog()
-    Timer().schedule(100) {
+    Timer().schedule(1000) {
       body.addEncoded("a", "PlaceBet")
       body.addEncoded("s", user.getString("session"))
       body.addEncoded("Low", "0")
@@ -235,6 +240,7 @@ class HomeActivity : AppCompatActivity() {
       body.addEncoded("ClientSeed", seed)
       body.addEncoded("Currency", "doge")
       json = DogeController(body).call()
+      Log.i("response", json.toString())
       loading.closeDialog()
       if (json.getInt("code") == 200) {
         seed = json.getJSONObject("data")["Next"].toString()
@@ -278,7 +284,7 @@ class HomeActivity : AppCompatActivity() {
 
             maxBalance = bitCoinFormat.dogeToDecimal(bitCoinFormat.decimalToDoge(payIn.multiply(percent.toBigDecimal())).multiply(payInMultiple))
             textFund.text = "Maximum : ${bitCoinFormat.decimalToDoge(maxBalance).toPlainString()}"
-            editTextAmount.isEnabled = true
+            buttonStake.visibility = Button.VISIBLE
 
             seekBar.progress = seekBar.progress + 1
             body.addEncoded("stop", "false")
@@ -289,7 +295,7 @@ class HomeActivity : AppCompatActivity() {
           Timer().schedule(100) {
             WebController.Post("stake.store", user.getString("token"), body).call()
             runOnUiThread {
-              buttonStake.isEnabled = true
+              buttonStake.visibility = Button.VISIBLE
               editTextAmount.setText("")
               loading.closeDialog()
             }
@@ -297,7 +303,7 @@ class HomeActivity : AppCompatActivity() {
         }
       } else {
         runOnUiThread {
-          buttonStake.isEnabled = true
+          buttonStake.visibility = Button.VISIBLE
           Popup(applicationContext).show(json.getString("data"), Toast.LENGTH_SHORT)
           loading.closeDialog()
         }
