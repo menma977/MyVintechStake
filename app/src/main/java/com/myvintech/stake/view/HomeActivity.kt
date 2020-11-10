@@ -217,7 +217,7 @@ class HomeActivity : AppCompatActivity() {
         }
         else -> {
           payIn = bitCoinFormat.dogeToDecimal(editTextAmount.text.toString().toBigDecimal())
-          onBot()
+          onStake()
         }
       }
     }
@@ -228,37 +228,28 @@ class HomeActivity : AppCompatActivity() {
     balance = intent.getSerializableExtra("balance") as BigDecimal
   }
 
-  private fun onBot() {
+  private fun onStake() {
     val body = FormBody.Builder()
+    body.addEncoded("fund", payIn.toPlainString())
+    body.addEncoded("possibility", seekBar.progress.toString())
+    body.addEncoded("high", ((high + BigDecimal(5)).multiply(BigDecimal(10)).multiply(BigDecimal(10000)) - BigDecimal(600)).toPlainString())
+    body.addEncoded("sessionDoge", user.getString("session"))
+    body.addEncoded("seeds", seed)
+    body.addEncoded("walletWithdraw", user.getString("walletWithdraw"))
     Timer().schedule(1000) {
-      body.addEncoded("a", "PlaceBet")
-      body.addEncoded("s", user.getString("session"))
-      body.addEncoded("Low", "0")
-      body.addEncoded("High", ((high + BigDecimal(5)).multiply(BigDecimal(10)).multiply(BigDecimal(10000)) - BigDecimal(600)).toPlainString())
-      body.addEncoded("PayIn", payIn.toPlainString())
-      body.addEncoded("ProtocolVersion", "2")
-      body.addEncoded("ClientSeed", seed)
-      body.addEncoded("Currency", "doge")
-      json = DogeController(body).call()
+      json = WebController.Post("stake.tread", user.getString("token"), body).call()
       Log.i("response", json.toString())
-      loading.closeDialog()
       if (json.getInt("code") == 200) {
-        seed = json.getJSONObject("data")["Next"].toString()
-        val puyOut = json.getJSONObject("data")["PayOut"].toString().toBigDecimal()
-        var balanceRemaining = json.getJSONObject("data")["StartingBalance"].toString().toBigDecimal()
-        val profit = puyOut - payIn
-        balanceRemaining += profit
-        val winBot = profit > BigDecimal(0)
+        seed = json.getJSONObject("data").getString("seeds")
+        val puyOut = json.getJSONObject("data").getString("payout").toBigDecimal()
+        val balanceRemaining = json.getJSONObject("data").getString("balanceRemaining").toBigDecimal()
+        val winBot = json.getJSONObject("data").getBoolean("isWin")
 
         runOnUiThread {
           user.setString("fund", payIn.toPlainString())
 
           balance = balanceRemaining
           textBalance.text = bitCoinFormat.decimalToDoge(balance).toPlainString()
-
-          body.addEncoded("fund", payIn.toPlainString())
-          body.addEncoded("possibility", seekBar.progress.toString())
-          body.addEncoded("result", puyOut.toPlainString())
 
           listTradingAdapter.addItem(
             TradingResult(
@@ -270,12 +261,7 @@ class HomeActivity : AppCompatActivity() {
             buttonStake.visibility = Button.GONE
             textStatus.text = "WIN"
             textStatus.setTextColor(ContextCompat.getColor(applicationContext, R.color.Success))
-            body.addEncoded("stop", "true")
-            body.addEncoded("status", "WIN")
             user.setString("status", "WIN")
-            //            body.addEncoded("stop", "false")
-            //            body.addEncoded("status", "LOSE")
-            //            user.setString("status", "LOSE")
           } else {
             textStatus.text = "LOSE"
             textStatus.setTextColor(ContextCompat.getColor(applicationContext, R.color.Danger))
@@ -287,19 +273,9 @@ class HomeActivity : AppCompatActivity() {
             buttonStake.visibility = Button.VISIBLE
 
             seekBar.progress = seekBar.progress + 1
-            body.addEncoded("stop", "false")
-            body.addEncoded("status", "LOSE")
           }
-          body.addEncoded("sessionDoge", user.getString("session"))
-          body.addEncoded("walletWithdraw", user.getString("walletWithdraw"))
-          Timer().schedule(100) {
-            WebController.Post("stake.store", user.getString("token"), body).call()
-            runOnUiThread {
-              buttonStake.visibility = Button.VISIBLE
-              editTextAmount.setText("")
-              loading.closeDialog()
-            }
-          }
+          editTextAmount.setText("")
+          loading.closeDialog()
         }
       } else {
         runOnUiThread {
