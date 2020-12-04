@@ -7,7 +7,7 @@ import android.app.Dialog
 import com.myvintech.stake.R
 
 @SuppressLint("InflateParams")
-class Loading(private val activity: Activity) {
+class Loading(activity: Activity) {
   private val dialog = Dialog(activity, Theme_Translucent_NoTitleBar)
 
   init {
