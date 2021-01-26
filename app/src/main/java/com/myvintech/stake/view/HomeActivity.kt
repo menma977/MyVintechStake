@@ -431,6 +431,11 @@ class HomeActivity : AppCompatActivity() {
         val viewProbability = "Possibility: ${(high + BigDecimal(5)) * BigDecimal(10)}%"
         textProbability.text = viewProbability
 
+        println("===========================================")
+        println(user.getBoolean("isStake").toString())
+        println(user.getString("status"))
+        println("===========================================")
+
         if (user.getBoolean("isStake") && user.getString("status") == "WIN") {
           buttonStake.visibility = Button.GONE
           buttonStop.visibility = Button.GONE
